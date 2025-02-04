@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
-	"github.com/gbh007/hgraber-next-agent-core/open_api/agentAPI"
+	"github.com/gbh007/hgraber-next/open_api/agentAPI"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/google/uuid"

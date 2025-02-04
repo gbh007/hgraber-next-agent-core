@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 
-	"github.com/gbh007/hgraber-next-agent-core/open_api/agentAPI"
+	"github.com/gbh007/hgraber-next/open_api/agentAPI"
 )
 
 func (c *Controller) APIHighwayTokenCreatePost(ctx context.Context) (agentAPI.APIHighwayTokenCreatePostRes, error) {

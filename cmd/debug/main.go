@@ -16,8 +16,8 @@ import (
 	"github.com/gbh007/hgraber-next-agent-core/config"
 	"github.com/gbh007/hgraber-next-agent-core/dataprovider/loader"
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
-	"github.com/gbh007/hgraber-next-agent-core/external"
-	"github.com/gbh007/hgraber-next-agent-core/pkg"
+	"github.com/gbh007/hgraber-next/external"
+	"github.com/gbh007/hgraber-next/pkg"
 )
 
 func main() {

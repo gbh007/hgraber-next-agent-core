@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
-	"github.com/gbh007/hgraber-next-agent-core/open_api/agentAPI"
-	"github.com/gbh007/hgraber-next-agent-core/pkg"
+	"github.com/gbh007/hgraber-next/open_api/agentAPI"
+	"github.com/gbh007/hgraber-next/pkg"
 )
 
 func (c *Controller) APIFsInfoPost(ctx context.Context, req *agentAPI.APIFsInfoPostReq) (agentAPI.APIFsInfoPostRes, error) {

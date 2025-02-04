@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/gbh007/hgraber-next-agent-core/pkg"
+	"github.com/gbh007/hgraber-next/pkg"
 
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
 	"github.com/gbh007/hgraber-next-agent-core/entities"

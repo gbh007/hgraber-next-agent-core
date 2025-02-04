@@ -8,7 +8,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/gbh007/hgraber-next-agent-core/pkg"
+	"github.com/gbh007/hgraber-next/pkg"
 )
 
 func (s *Storage) Get(ctx context.Context, relativePath string) (io.Reader, error) {
@@ -18,9 +18,7 @@ func (s *Storage) Get(ctx context.Context, relativePath string) (io.Reader, erro
 	}
 
 	if s.useUnsafeCloser {
-		return &pkg.UnsafeCloser{
-			Body: f,
-		}, nil
+		return pkg.UnsafeCloser(f), nil
 	}
 
 	defer f.Close()
