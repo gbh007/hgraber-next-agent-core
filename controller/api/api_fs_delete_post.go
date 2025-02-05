@@ -5,31 +5,31 @@ import (
 	"errors"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
-	"github.com/gbh007/hgraber-next/open_api/agentAPI"
+	"github.com/gbh007/hgraber-next/openapi/agentapi"
 )
 
-func (c *Controller) APIFsDeletePost(ctx context.Context, req *agentAPI.APIFsDeletePostReq) (agentAPI.APIFsDeletePostRes, error) {
+func (c *Controller) APIFsDeletePost(ctx context.Context, req *agentapi.APIFsDeletePostReq) (agentapi.APIFsDeletePostRes, error) {
 	if c.fileUseCase == nil {
-		return &agentAPI.APIFsDeletePostBadRequest{
+		return &agentapi.APIFsDeletePostBadRequest{
 			InnerCode: ValidationCode,
-			Details:   agentAPI.NewOptString("unsupported api"),
+			Details:   agentapi.NewOptString("unsupported api"),
 		}, nil
 	}
 
 	err := c.fileUseCase.Delete(ctx, req.FileID)
 	if errors.Is(err, entities.FileNotFoundError) {
-		return &agentAPI.APIFsDeletePostNotFound{
+		return &agentapi.APIFsDeletePostNotFound{
 			InnerCode: FileUseCaseCode,
-			Details:   agentAPI.NewOptString(err.Error()),
+			Details:   agentapi.NewOptString(err.Error()),
 		}, nil
 	}
 
 	if err != nil {
-		return &agentAPI.APIFsDeletePostInternalServerError{
+		return &agentapi.APIFsDeletePostInternalServerError{
 			InnerCode: FileUseCaseCode,
-			Details:   agentAPI.NewOptString(err.Error()),
+			Details:   agentapi.NewOptString(err.Error()),
 		}, nil
 	}
 
-	return &agentAPI.APIFsDeletePostNoContent{}, nil
+	return &agentapi.APIFsDeletePostNoContent{}, nil
 }

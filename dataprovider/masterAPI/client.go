@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gbh007/hgraber-next/open_api/serverAPI"
+	"github.com/gbh007/hgraber-next/openapi/serverapi"
 	"github.com/ogen-go/ogen/ogenerrors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
@@ -14,7 +14,7 @@ import (
 const agentTimeout = time.Minute * 1
 
 type Client struct {
-	rawClient *serverAPI.Client
+	rawClient *serverapi.Client
 }
 
 func New(baseURL string, token string) (*Client, error) {
@@ -23,12 +23,12 @@ func New(baseURL string, token string) (*Client, error) {
 		Timeout:   agentTimeout,
 	}
 
-	rawClient, err := serverAPI.NewClient(
+	rawClient, err := serverapi.NewClient(
 		baseURL,
 		securitySource{
 			token: token,
 		},
-		serverAPI.WithClient(&httpClient),
+		serverapi.WithClient(&httpClient),
 	)
 	if err != nil {
 		return nil, err
@@ -54,12 +54,12 @@ type securitySource struct {
 	token string
 }
 
-func (s securitySource) HeaderAuth(ctx context.Context, operationName string) (serverAPI.HeaderAuth, error) {
-	return serverAPI.HeaderAuth{
+func (s securitySource) HeaderAuth(ctx context.Context, operationName string) (serverapi.HeaderAuth, error) {
+	return serverapi.HeaderAuth{
 		APIKey: s.token,
 	}, nil
 }
 
-func (s securitySource) Cookies(ctx context.Context, operationName string) (serverAPI.Cookies, error) {
-	return serverAPI.Cookies{}, ogenerrors.ErrSkipClientSecurity
+func (s securitySource) Cookies(ctx context.Context, operationName string) (serverapi.Cookies, error) {
+	return serverapi.Cookies{}, ogenerrors.ErrSkipClientSecurity
 }

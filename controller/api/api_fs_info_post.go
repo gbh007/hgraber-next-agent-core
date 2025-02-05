@@ -4,42 +4,42 @@ import (
 	"context"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
-	"github.com/gbh007/hgraber-next/open_api/agentAPI"
+	"github.com/gbh007/hgraber-next/openapi/agentapi"
 	"github.com/gbh007/hgraber-next/pkg"
 )
 
-func (c *Controller) APIFsInfoPost(ctx context.Context, req *agentAPI.APIFsInfoPostReq) (agentAPI.APIFsInfoPostRes, error) {
+func (c *Controller) APIFsInfoPost(ctx context.Context, req *agentapi.APIFsInfoPostReq) (agentapi.APIFsInfoPostRes, error) {
 	if c.fileUseCase == nil {
-		return &agentAPI.APIFsInfoPostBadRequest{
+		return &agentapi.APIFsInfoPostBadRequest{
 			InnerCode: ValidationCode,
-			Details:   agentAPI.NewOptString("unsupported api"),
+			Details:   agentapi.NewOptString("unsupported api"),
 		}, nil
 	}
 
 	state, err := c.fileUseCase.State(ctx, req.IncludeFileIds.Value, req.IncludeFileSizes.Value)
 	if err != nil {
-		return &agentAPI.APIFsInfoPostInternalServerError{
+		return &agentapi.APIFsInfoPostInternalServerError{
 			InnerCode: FileUseCaseCode,
-			Details:   agentAPI.NewOptString(err.Error()),
+			Details:   agentapi.NewOptString(err.Error()),
 		}, nil
 	}
 
-	return &agentAPI.APIFsInfoPostOK{
+	return &agentapi.APIFsInfoPostOK{
 		FileIds: state.FileIDs,
-		TotalFileCount: agentAPI.OptInt64{
+		TotalFileCount: agentapi.OptInt64{
 			Value: state.TotalFileCount,
 			Set:   state.TotalFileCount > 0,
 		},
-		TotalFileSize: agentAPI.OptInt64{
+		TotalFileSize: agentapi.OptInt64{
 			Value: state.TotalFileSize,
 			Set:   state.TotalFileSize > 0,
 		},
-		AvailableSize: agentAPI.OptInt64{
+		AvailableSize: agentapi.OptInt64{
 			Value: state.AvailableSize,
 			Set:   state.AvailableSize > 0,
 		},
-		Files: pkg.Map(state.Files, func(raw entities.FSStateFile) agentAPI.APIFsInfoPostOKFilesItem {
-			return agentAPI.APIFsInfoPostOKFilesItem{
+		Files: pkg.Map(state.Files, func(raw entities.FSStateFile) agentapi.APIFsInfoPostOKFilesItem {
+			return agentapi.APIFsInfoPostOKFilesItem{
 				ID:        raw.ID,
 				Size:      raw.Size,
 				CreatedAt: raw.CreatedAt,

@@ -5,31 +5,31 @@ import (
 	"errors"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
-	"github.com/gbh007/hgraber-next/open_api/agentAPI"
+	"github.com/gbh007/hgraber-next/openapi/agentapi"
 )
 
-func (c *Controller) APIFsCreatePost(ctx context.Context, req agentAPI.APIFsCreatePostReq, params agentAPI.APIFsCreatePostParams) (agentAPI.APIFsCreatePostRes, error) {
+func (c *Controller) APIFsCreatePost(ctx context.Context, req agentapi.APIFsCreatePostReq, params agentapi.APIFsCreatePostParams) (agentapi.APIFsCreatePostRes, error) {
 	if c.fileUseCase == nil {
-		return &agentAPI.APIFsCreatePostBadRequest{
+		return &agentapi.APIFsCreatePostBadRequest{
 			InnerCode: ValidationCode,
-			Details:   agentAPI.NewOptString("unsupported api"),
+			Details:   agentapi.NewOptString("unsupported api"),
 		}, nil
 	}
 
 	err := c.fileUseCase.Create(ctx, params.FileID, req.Data)
 	if errors.Is(err, entities.FileAlreadyExistsError) {
-		return &agentAPI.APIFsCreatePostConflict{
+		return &agentapi.APIFsCreatePostConflict{
 			InnerCode: FileUseCaseCode,
-			Details:   agentAPI.NewOptString(err.Error()),
+			Details:   agentapi.NewOptString(err.Error()),
 		}, nil
 	}
 
 	if err != nil {
-		return &agentAPI.APIFsCreatePostInternalServerError{
+		return &agentapi.APIFsCreatePostInternalServerError{
 			InnerCode: FileUseCaseCode,
-			Details:   agentAPI.NewOptString(err.Error()),
+			Details:   agentapi.NewOptString(err.Error()),
 		}, nil
 	}
 
-	return &agentAPI.APIFsCreatePostNoContent{}, nil
+	return &agentapi.APIFsCreatePostNoContent{}, nil
 }

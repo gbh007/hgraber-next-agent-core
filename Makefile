@@ -6,11 +6,6 @@ build:
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o ./_build/hgraber-agent-arm64 ./cmd/agent
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./_build/hgraber-agent-amd64 ./cmd/agent
 
-.PHONY: generate
-generate:
-	go run github.com/ogen-go/ogen/cmd/ogen@v1.2.1 --target open_api/agentAPI -package agentAPI --clean open_api/agent.yaml
-	go run github.com/ogen-go/ogen/cmd/ogen@v1.2.1 --target open_api/serverAPI -package serverAPI --clean open_api/server.yaml
-
 .PHONY: docker
 docker: build	
 	docker build -f Dockerfile \

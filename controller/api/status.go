@@ -4,20 +4,20 @@ import (
 	"context"
 	"strings"
 
-	"github.com/gbh007/hgraber-next/open_api/agentAPI"
+	"github.com/gbh007/hgraber-next/openapi/agentapi"
 )
 
-func (c *Controller) APICoreStatusGet(ctx context.Context) (agentAPI.APICoreStatusGetRes, error) {
-	return &agentAPI.APICoreStatusGetOK{
+func (c *Controller) APICoreStatusGet(ctx context.Context) (agentapi.APICoreStatusGetRes, error) {
+	return &agentapi.APICoreStatusGetOK{
 		StartAt: c.startAt,
-		Status:  agentAPI.APICoreStatusGetOKStatusOk,
-		Problems: []agentAPI.APICoreStatusGetOKProblemsItem{
+		Status:  agentapi.APICoreStatusGetOKStatusOk,
+		Problems: []agentapi.APICoreStatusGetOKProblemsItem{
 			{
-				Type:    agentAPI.APICoreStatusGetOKProblemsItemTypeInfo,
+				Type:    agentapi.APICoreStatusGetOKProblemsItemTypeInfo,
 				Details: "parsers: " + strings.Join(c.parserCodes, ", "),
 			},
 			{
-				Type:    agentAPI.APICoreStatusGetOKProblemsItemTypeInfo,
+				Type:    agentapi.APICoreStatusGetOKProblemsItemTypeInfo,
 				Details: "modules: " + strings.Join(c.enabledModules, ", "),
 			},
 		},

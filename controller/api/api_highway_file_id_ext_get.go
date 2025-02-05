@@ -6,44 +6,44 @@ import (
 	"mime"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
-	"github.com/gbh007/hgraber-next/open_api/agentAPI"
+	"github.com/gbh007/hgraber-next/openapi/agentapi"
 )
 
-func (c *Controller) APIHighwayFileIDExtGet(ctx context.Context, params agentAPI.APIHighwayFileIDExtGetParams) (agentAPI.APIHighwayFileIDExtGetRes, error) {
+func (c *Controller) APIHighwayFileIDExtGet(ctx context.Context, params agentapi.APIHighwayFileIDExtGetParams) (agentapi.APIHighwayFileIDExtGetRes, error) {
 	if c.highwayUseCase == nil {
-		return &agentAPI.APIHighwayFileIDExtGetBadRequest{
+		return &agentapi.APIHighwayFileIDExtGetBadRequest{
 			InnerCode: ValidationCode,
-			Details:   agentAPI.NewOptString("unsupported api"),
+			Details:   agentapi.NewOptString("unsupported api"),
 		}, nil
 	}
 
 	if params.Token == "" {
-		return &agentAPI.APIHighwayFileIDExtGetUnauthorized{
+		return &agentapi.APIHighwayFileIDExtGetUnauthorized{
 			InnerCode: ValidationCode,
-			Details:   agentAPI.NewOptString("unsupported api"),
+			Details:   agentapi.NewOptString("unsupported api"),
 		}, nil
 	}
 
 	err := c.highwayUseCase.ValidateToken(ctx, params.Token)
 	if err != nil {
-		return &agentAPI.APIHighwayFileIDExtGetForbidden{
+		return &agentapi.APIHighwayFileIDExtGetForbidden{
 			InnerCode: HighwayUseCaseCode,
-			Details:   agentAPI.NewOptString(err.Error()),
+			Details:   agentapi.NewOptString(err.Error()),
 		}, nil
 	}
 
 	body, err := c.highwayUseCase.Get(ctx, params.ID)
 	if errors.Is(err, entities.FileNotFoundError) {
-		return &agentAPI.APIHighwayFileIDExtGetNotFound{
+		return &agentapi.APIHighwayFileIDExtGetNotFound{
 			InnerCode: HighwayUseCaseCode,
-			Details:   agentAPI.NewOptString(err.Error()),
+			Details:   agentapi.NewOptString(err.Error()),
 		}, nil
 	}
 
 	if err != nil {
-		return &agentAPI.APIHighwayFileIDExtGetInternalServerError{
+		return &agentapi.APIHighwayFileIDExtGetInternalServerError{
 			InnerCode: HighwayUseCaseCode,
-			Details:   agentAPI.NewOptString(err.Error()),
+			Details:   agentapi.NewOptString(err.Error()),
 		}, nil
 	}
 
@@ -54,9 +54,9 @@ func (c *Controller) APIHighwayFileIDExtGet(ctx context.Context, params agentAPI
 		contentType = "application/octet-stream"
 	}
 
-	return &agentAPI.APIHighwayFileIDExtGetOKHeaders{
+	return &agentapi.APIHighwayFileIDExtGetOKHeaders{
 		ContentType: contentType,
-		Response: agentAPI.APIHighwayFileIDExtGetOK{
+		Response: agentapi.APIHighwayFileIDExtGetOK{
 			Data: body,
 		},
 	}, nil

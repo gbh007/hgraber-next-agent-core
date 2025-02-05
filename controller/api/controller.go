@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
-	"github.com/gbh007/hgraber-next/open_api/agentAPI"
+	"github.com/gbh007/hgraber-next/openapi/agentapi"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/google/uuid"
@@ -47,7 +47,7 @@ type Controller struct {
 	addr    string
 	debug   bool
 
-	ogenServer *agentAPI.Server
+	ogenServer *agentapi.Server
 
 	exportUseCase   ExportUseCases
 	fileUseCase     FileUseCases
@@ -105,7 +105,7 @@ func New(
 		c.enabledModules = append(c.enabledModules, "highway")
 	}
 
-	ogenServer, err := agentAPI.NewServer(c, c)
+	ogenServer, err := agentapi.NewServer(c, c)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func New(
 
 var errorAccessForbidden = errors.New("access forbidden")
 
-func (c *Controller) HandleHeaderAuth(ctx context.Context, operationName string, t agentAPI.HeaderAuth) (context.Context, error) {
+func (c *Controller) HandleHeaderAuth(ctx context.Context, operationName string, t agentapi.HeaderAuth) (context.Context, error) {
 	if c.token == "" {
 		return ctx, nil
 	}

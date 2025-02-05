@@ -5,14 +5,14 @@ import (
 	"net/url"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
-	"github.com/gbh007/hgraber-next/open_api/agentAPI"
+	"github.com/gbh007/hgraber-next/openapi/agentapi"
 )
 
-func (c *Controller) APIExportArchivePost(ctx context.Context, req agentAPI.APIExportArchivePostReq, params agentAPI.APIExportArchivePostParams) (agentAPI.APIExportArchivePostRes, error) {
+func (c *Controller) APIExportArchivePost(ctx context.Context, req agentapi.APIExportArchivePostReq, params agentapi.APIExportArchivePostParams) (agentapi.APIExportArchivePostRes, error) {
 	if c.exportUseCase == nil {
-		return &agentAPI.APIExportArchivePostBadRequest{
+		return &agentapi.APIExportArchivePostBadRequest{
 			InnerCode: ValidationCode,
-			Details:   agentAPI.NewOptString("unsupported api"),
+			Details:   agentapi.NewOptString("unsupported api"),
 		}, nil
 	}
 
@@ -29,11 +29,11 @@ func (c *Controller) APIExportArchivePost(ctx context.Context, req agentAPI.APIE
 		BookURL:  u,
 	})
 	if err != nil {
-		return &agentAPI.APIExportArchivePostInternalServerError{
+		return &agentapi.APIExportArchivePostInternalServerError{
 			InnerCode: ExportUseCaseCode,
-			Details:   agentAPI.NewOptString(err.Error()),
+			Details:   agentapi.NewOptString(err.Error()),
 		}, nil
 	}
 
-	return &agentAPI.APIExportArchivePostNoContent{}, nil
+	return &agentapi.APIExportArchivePostNoContent{}, nil
 }
