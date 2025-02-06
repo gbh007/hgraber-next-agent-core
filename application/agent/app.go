@@ -78,12 +78,7 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 	}
 
 	if len(parsers) > 0 {
-		loader := loader.New(
-			logger,
-			cfg.Application.ClientTimeout,
-			parsers,
-		)
-
+		loader := loader.New(parsers)
 		agentUseCases = agentUC.New(logger, loader)
 
 		logger.DebugContext(

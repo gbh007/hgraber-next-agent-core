@@ -21,12 +21,20 @@ type Requester struct {
 	logger *slog.Logger
 }
 
-func New(logger *slog.Logger, timeout time.Duration) *Requester {
+func New(
+	logger *slog.Logger,
+	timeout time.Duration,
+	transport http.RoundTripper,
+) *Requester {
+	if transport == nil {
+		transport = http.DefaultTransport
+	}
+
 	return &Requester{
 		client: &http.Client{
 			Timeout: timeout,
 			Transport: otelhttp.NewTransport(
-				http.DefaultTransport,
+				transport,
 				otelhttp.WithPropagators(noopPropagator{}),
 			),
 		},

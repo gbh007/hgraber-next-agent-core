@@ -58,8 +58,6 @@ func main() {
 	}
 
 	loader := loader.New(
-		l,
-		time.Minute,
 		loader.NewDefaultParsers(
 			l,
 			*hgToken,

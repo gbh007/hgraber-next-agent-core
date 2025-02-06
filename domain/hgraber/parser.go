@@ -3,7 +3,7 @@ package hgraber
 import (
 	"context"
 	"errors"
-	"net/http"
+	"io"
 )
 
 var (
@@ -17,8 +17,8 @@ type Parser interface {
 	Load(ctx context.Context, u string) (BookParser, error)
 	Prefixes() []string
 	Collisions() map[string][]string
-	Headers(u string) (http.Header, error)
 	AllBooks(ctx context.Context, u string) ([]string, error)
+	LoadImage(ctx context.Context, u string, bookUrl string) (io.ReadCloser, error)
 }
 
 type BookParser interface {

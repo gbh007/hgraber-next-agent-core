@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"net/http"
 	"strings"
 	"time"
 
@@ -17,9 +16,6 @@ import (
 )
 
 type Loader struct {
-	logger    *slog.Logger
-	requester *request.Requester
-
 	parsers []hgraber.Parser
 }
 
@@ -29,7 +25,7 @@ func NewDefaultParsers(
 	timeout time.Duration,
 	enabledParsers []string,
 ) []hgraber.Parser {
-	requester := request.New(logger, timeout)
+	requester := request.New(logger, timeout, nil)
 
 	parsers := make([]hgraber.Parser, 0, len(enabledParsers))
 
@@ -59,16 +55,10 @@ func NewDefaultParsers(
 }
 
 func New(
-	logger *slog.Logger,
-	timeout time.Duration,
 	parsers []hgraber.Parser,
 ) *Loader {
-	requester := request.New(logger, timeout)
-
 	return &Loader{
-		logger:    logger,
-		requester: requester,
-		parsers:   parsers,
+		parsers: parsers,
 	}
 }
 
@@ -122,15 +112,12 @@ func (l *Loader) Load(ctx context.Context, u string) (hgraber.BookParser, error)
 }
 
 func (l *Loader) LoadImage(ctx context.Context, u string, bookUrl string) (io.ReadCloser, error) {
-	var headers http.Header
-
-	// FIXME: переписать получше
-	p, _ := l.getParser(bookUrl)
-	if p != nil {
-		headers, _ = p.Headers(bookUrl)
+	p, err := l.getParser(bookUrl)
+	if err != nil {
+		return nil, fmt.Errorf("get parser: %w", err)
 	}
 
-	data, err := l.requester.Request(ctx, u, headers)
+	data, err := p.LoadImage(ctx, u, bookUrl)
 	if err != nil {
 		return nil, fmt.Errorf("load image: %w", err)
 	}

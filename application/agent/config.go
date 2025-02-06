@@ -15,6 +15,7 @@ func parseConfig[T any]() (config.Config[T], bool, error) {
 	configPath := flag.String("config", "config.yaml", "path to config")
 	generateConfig := flag.String("generate-config", "", "generate example config")
 	scan := flag.Bool("scan", false, "scan zip file to register in db")
+	useEnv := flag.Bool("use-env", false, "use env config")
 	flag.Parse()
 
 	defaultParsers := func() *T { return nil } // TODO: вынести установку этой функции в обвязку
@@ -28,7 +29,7 @@ func parseConfig[T any]() (config.Config[T], bool, error) {
 		os.Exit(0)
 	}
 
-	c, err := config.ImportConfig(*configPath, defaultParsers, true)
+	c, err := config.ImportConfig(*configPath, defaultParsers, *useEnv)
 
 	return c, *scan, err
 }

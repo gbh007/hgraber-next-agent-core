@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -63,12 +64,7 @@ func (p *Parser) Load(ctx context.Context, u string) (hgraber.BookParser, error)
 		return nil, fmt.Errorf("%w: marshal request body: %w", ParserError, err)
 	}
 
-	headers, err := p.Headers(u)
-	if err != nil {
-		return nil, fmt.Errorf("%w: headers: %w", ParserError, err)
-	}
-
-	raw, err := p.Requester.RequestPost(ctx, originUrl.String(), headers, bytes.NewReader(requestBody))
+	raw, err := p.Requester.RequestPost(ctx, originUrl.String(), p.headers(), bytes.NewReader(requestBody))
 	if err != nil {
 		return nil, fmt.Errorf("%w: request: %w", ParserError, err)
 	}
@@ -81,12 +77,21 @@ func (p *Parser) Load(ctx context.Context, u string) (hgraber.BookParser, error)
 	return bookParser, nil
 }
 
-func (p *Parser) Headers(u string) (http.Header, error) {
+func (p *Parser) headers() http.Header {
 	headers := make(http.Header, 1)
 
 	headers.Set("x-token", p.token)
 
-	return headers, nil
+	return headers
+}
+
+func (p *Parser) LoadImage(ctx context.Context, u string, bookUrl string) (io.ReadCloser, error) {
+	data, err := p.Requester.Request(ctx, u, p.headers())
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 type BookParser struct {

@@ -18,6 +18,7 @@ var (
 )
 
 type Requester interface {
+	Request(ctx context.Context, URL string, headers http.Header) (io.ReadCloser, error)
 	RequestString(ctx context.Context, URL string) (string, error)
 	RequestStringWithRedirect(ctx context.Context, URL string) (string, string, error)
 	RequestPost(ctx context.Context, u string, headers http.Header, body io.Reader) ([]byte, error)
@@ -73,12 +74,17 @@ func (cp CoreParser) Collisions() map[string][]string {
 	return cp.collisions
 }
 
-func (cp CoreParser) Headers(u string) (http.Header, error) {
+func (cp CoreParser) AllBooks(ctx context.Context, u string) ([]string, error) {
 	return nil, nil
 }
 
-func (cp CoreParser) AllBooks(ctx context.Context, u string) ([]string, error) {
-	return nil, nil
+func (cp CoreParser) LoadImage(ctx context.Context, u string, bookUrl string) (io.ReadCloser, error) {
+	data, err := cp.Requester.Request(ctx, u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func TrimLastSlash(URL string, count int) string {
