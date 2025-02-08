@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"text/template"
 
@@ -17,15 +18,24 @@ func ExportToFile[T any](cfg Config[T], filename string) error {
 
 	defer f.Close()
 
-	enc := yaml.NewEncoder(f)
+	err = ExportToWriter(cfg, f)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ExportToWriter[T any](cfg Config[T], w io.Writer) error {
+	enc := yaml.NewEncoder(w)
 	enc.SetIndent(2)
 
-	err = enc.Encode(cfg)
+	err := enc.Encode(cfg)
 	if err != nil {
 		return fmt.Errorf("encode yaml: %w", err)
 	}
 
-	err = envconfig.Usaget("APP", &cfg, f, template.Must(template.New("cfg").Parse(envTemplate)))
+	err = envconfig.Usaget("APP", &cfg, w, template.Must(template.New("cfg").Parse(envTemplate)))
 	if err != nil {
 		return fmt.Errorf("encode env usage: %w", err)
 	}

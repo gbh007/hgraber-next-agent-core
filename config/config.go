@@ -4,6 +4,7 @@ import "time"
 
 type Config[T any] struct {
 	API         API         `envconfig:"API" yaml:"api"`
+	DebugServer DebugServer `envconfig:"DEBUG_SERVER" yaml:"debug_server"`
 	Application Application `envconfig:"APPLICATION" yaml:"application"`
 	Parsers     *T          `envconfig:"PARSERS" yaml:"parsers"`
 	FSBase      FSBase      `envconfig:"FS_BASE" yaml:"fs_base"`
@@ -15,6 +16,7 @@ type Config[T any] struct {
 func DefaultConfig[T any](defaultParsers func() *T) Config[T] {
 	return Config[T]{
 		API:         DefaultAPI(),
+		DebugServer: DefaultDebugServer(),
 		Parsers:     defaultParsers(),
 		Application: DefaultApplication(),
 		FSBase:      DefaultFSBase(),
@@ -68,6 +70,16 @@ func DefaultAPI() API {
 		Addr:  ":8080",
 		Token: "",
 	}
+}
+
+type DebugServer struct {
+	Addr            string `yaml:"addr" envconfig:"ADDR"`
+	LogErrorHandler bool   `yaml:"log_error_handler" envconfig:"LOG_ERROR_HANDLER"`
+	Debug           bool   `yaml:"debug" envconfig:"DEBUG"`
+}
+
+func DefaultDebugServer() DebugServer {
+	return DebugServer{}
 }
 
 type Parsers struct {

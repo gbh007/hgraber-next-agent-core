@@ -9,6 +9,7 @@ import (
 	"github.com/gbh007/hgraber-next-agent-core/config"
 	"github.com/gbh007/hgraber-next-agent-core/controller/api"
 	"github.com/gbh007/hgraber-next-agent-core/controller/async"
+	"github.com/gbh007/hgraber-next-agent-core/controller/debugserver"
 	"github.com/gbh007/hgraber-next-agent-core/dataprovider/dataFS"
 	"github.com/gbh007/hgraber-next-agent-core/dataprovider/exportFS"
 	"github.com/gbh007/hgraber-next-agent-core/dataprovider/loader"
@@ -194,27 +195,37 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 		return parser.Name()
 	})
 
-	apiController, err := api.New(
-		cfg.API,
-		time.Now(),
-		logger,
-		tracer,
-		agentUseCases,
-		exportStorage,
-		fileStorage,
-		highwayUseCases,
-		parserNames,
-	)
-	if err != nil {
-		logger.ErrorContext(
-			ctx, "fail init api controller",
-			slog.Any("error", err),
+	if cfg.API.Addr != "" {
+		apiController, err := api.New(
+			cfg.API,
+			time.Now(),
+			logger,
+			tracer,
+			agentUseCases,
+			exportStorage,
+			fileStorage,
+			highwayUseCases,
+			parserNames,
 		)
+		if err != nil {
+			logger.ErrorContext(
+				ctx, "fail init api controller",
+				slog.Any("error", err),
+			)
 
-		os.Exit(1)
+			os.Exit(1)
+		}
+
+		async.RegisterRunner(ctx, apiController)
 	}
 
-	async.RegisterRunner(ctx, apiController)
+	if cfg.DebugServer.Addr != "" && agentUseCases != nil {
+		async.RegisterRunner(ctx, debugserver.New[T](
+			cfg,
+			logger,
+			agentUseCases,
+		))
+	}
 
 	logger.InfoContext(ctx, "application start")
 	defer logger.InfoContext(ctx, "application stop")

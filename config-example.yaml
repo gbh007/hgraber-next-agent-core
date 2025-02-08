@@ -3,6 +3,10 @@ api:
   token: agent-token
   log_error_handler: true
   debug: false
+debug_server:
+  addr: 127.0.0.1:8081
+  log_error_handler: true
+  debug: false
 application:
   debug: true
   trace_endpoint: ""
