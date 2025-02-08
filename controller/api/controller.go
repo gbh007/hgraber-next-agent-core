@@ -40,12 +40,20 @@ type HighwayUseCases interface {
 	Get(ctx context.Context, fileID uuid.UUID) (io.Reader, error)
 }
 
+type config interface {
+	GetAddr() string
+	GetToken() string
+	GetLogErrorHandler() bool
+	GetDebug() bool
+}
+
 type Controller struct {
-	startAt time.Time
-	logger  *slog.Logger
-	tracer  trace.Tracer
-	addr    string
-	debug   bool
+	startAt         time.Time
+	logger          *slog.Logger
+	tracer          trace.Tracer
+	addr            string
+	debug           bool
+	logErrorHandler bool
 
 	ogenServer *agentapi.Server
 
@@ -60,6 +68,7 @@ type Controller struct {
 }
 
 func New(
+	config config,
 	startAt time.Time,
 	logger *slog.Logger,
 	tracer trace.Tracer,
@@ -67,18 +76,16 @@ func New(
 	exportUseCase ExportUseCases,
 	fileUseCase FileUseCases,
 	highwayUseCase HighwayUseCases,
-	addr string,
-	debug bool,
-	token string,
 	parserCodes []string,
 ) (*Controller, error) {
 	c := &Controller{
-		startAt: startAt,
-		logger:  logger,
-		tracer:  tracer,
-		addr:    addr,
-		debug:   debug,
-		token:   token,
+		startAt:         startAt,
+		logger:          logger,
+		tracer:          tracer,
+		addr:            config.GetAddr(),
+		debug:           config.GetDebug(),
+		logErrorHandler: config.GetLogErrorHandler(),
+		token:           config.GetToken(),
 
 		parserCodes:    parserCodes,
 		enabledModules: make([]string, 0, 3),
@@ -105,7 +112,13 @@ func New(
 		c.enabledModules = append(c.enabledModules, "highway")
 	}
 
-	ogenServer, err := agentapi.NewServer(c, c)
+	ogenServer, err := agentapi.NewServer(
+		c, c,
+		agentapi.WithErrorHandler(c.methodErrorHandler),
+		agentapi.WithMethodNotAllowed(methodNotAllowed),
+		agentapi.WithNotFound(methodNotFound),
+		agentapi.WithMiddleware(c.simplePanicRecover),
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -195,6 +195,7 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 	})
 
 	apiController, err := api.New(
+		cfg.API,
 		time.Now(),
 		logger,
 		tracer,
@@ -202,9 +203,6 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 		exportStorage,
 		fileStorage,
 		highwayUseCases,
-		cfg.API.Addr,
-		cfg.Application.Debug,
-		cfg.API.Token,
 		parserNames,
 	)
 	if err != nil {

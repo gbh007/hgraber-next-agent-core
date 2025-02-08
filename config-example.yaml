@@ -1,6 +1,8 @@
 api:
   addr: 127.0.0.1:8080
   token: agent-token
+  log_error_handler: true
+  debug: false
 application:
   debug: true
   trace_endpoint: ""
