@@ -6,8 +6,10 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
+	"github.com/gbh007/hgraber-next-agent-core/metrics"
 )
 
 func (s *Storage) Create(ctx context.Context, data entities.ExportData) error {
@@ -24,6 +26,11 @@ func (s *Storage) CreateExport(ctx context.Context, data entities.ExportData) (s
 }
 
 func (s *Storage) create(ctx context.Context, data entities.ExportData) (string, error) {
+	startAt := time.Now()
+	defer func() {
+		metrics.RegisterFSActionTime("create_export", time.Since(startAt))
+	}()
+
 	var (
 		relativePath, absolutePath string
 		err                        error

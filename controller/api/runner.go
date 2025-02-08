@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 )
@@ -18,8 +19,13 @@ func (c *Controller) Name() string {
 func (c *Controller) Start(parentCtx context.Context) (chan struct{}, error) {
 	done := make(chan struct{})
 
+	mux := http.NewServeMux()
+
+	mux.Handle("/metrics", promhttp.Handler())
+	mux.Handle("/api/", otelPropagation(c.logIO(cors(c.ogenServer))))
+
 	server := &http.Server{
-		Handler:  otelPropagation(c.logIO(cors(c.ogenServer))),
+		Handler:  mux,
 		Addr:     c.addr,
 		ErrorLog: slog.NewLogLogger(c.logger.Handler(), slog.LevelError),
 	}

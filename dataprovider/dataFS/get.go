@@ -6,13 +6,20 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"github.com/google/uuid"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
+	"github.com/gbh007/hgraber-next-agent-core/metrics"
 )
 
 func (s *Storage) Get(ctx context.Context, fileID uuid.UUID) (io.Reader, error) {
+	startAt := time.Now()
+	defer func() {
+		metrics.RegisterFSActionTime("get", time.Since(startAt))
+	}()
+
 	filepath := s.filepath(fileID)
 
 	f, err := os.Open(filepath)

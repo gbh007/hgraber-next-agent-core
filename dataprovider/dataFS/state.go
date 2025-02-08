@@ -6,12 +6,19 @@ import (
 	"log/slog"
 	"os"
 	"path"
+	"time"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
+	"github.com/gbh007/hgraber-next-agent-core/metrics"
 	"github.com/google/uuid"
 )
 
 func (s *Storage) State(ctx context.Context, includeFileIDs, includeFileSizes bool) (entities.FSState, error) {
+	startAt := time.Now()
+	defer func() {
+		metrics.RegisterFSActionTime("state", time.Since(startAt))
+	}()
+
 	var state entities.FSState
 
 	if includeFileIDs || includeFileSizes {

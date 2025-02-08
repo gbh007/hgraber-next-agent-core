@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
+	"github.com/gbh007/hgraber-next-agent-core/metrics"
 	"github.com/gbh007/hgraber-next-agent-core/parser/hgraber_local"
 	"github.com/gbh007/hgraber-next-agent-core/parser/mock"
 	"github.com/gbh007/hgraber-next-agent-core/request"
@@ -98,10 +99,16 @@ func (l *Loader) HasParser(ctx context.Context, u string) (bool, error) {
 }
 
 func (l *Loader) Load(ctx context.Context, u string) (hgraber.BookParser, error) {
+	startAt := time.Now()
+
 	p, err := l.getParser(u)
 	if err != nil {
 		return nil, fmt.Errorf("get parser: %w", err)
 	}
+
+	defer func() {
+		metrics.RegisterParserActionTime("loader_load", p.Name(), time.Since(startAt))
+	}()
 
 	bookParser, err := p.Load(ctx, u)
 	if err != nil {
@@ -112,10 +119,16 @@ func (l *Loader) Load(ctx context.Context, u string) (hgraber.BookParser, error)
 }
 
 func (l *Loader) LoadImage(ctx context.Context, u string, bookUrl string) (io.ReadCloser, error) {
+	startAt := time.Now()
+
 	p, err := l.getParser(bookUrl)
 	if err != nil {
 		return nil, fmt.Errorf("get parser: %w", err)
 	}
+
+	defer func() {
+		metrics.RegisterParserActionTime("loader_load_image", p.Name(), time.Since(startAt))
+	}()
 
 	data, err := p.LoadImage(ctx, u, bookUrl)
 	if err != nil {
@@ -126,10 +139,16 @@ func (l *Loader) LoadImage(ctx context.Context, u string, bookUrl string) (io.Re
 }
 
 func (l *Loader) AllBooks(ctx context.Context, u string) ([]string, error) {
+	startAt := time.Now()
+
 	p, err := l.getParser(u)
 	if err != nil {
 		return nil, err
 	}
+
+	defer func() {
+		metrics.RegisterParserActionTime("loader_all_books", p.Name(), time.Since(startAt))
+	}()
 
 	data, err := p.AllBooks(ctx, u)
 	if err != nil {
@@ -139,7 +158,7 @@ func (l *Loader) AllBooks(ctx context.Context, u string) ([]string, error) {
 	return data, nil
 }
 
-// FIXME: сделать методом парсера (включить в базовый парсер)
+// FIXME: перенести логику работы с зеркалами, на мастер систему
 func (l *Loader) Collisions(ctx context.Context, u string) ([]string, error) {
 	p, err := l.getParser(u)
 	if err != nil {

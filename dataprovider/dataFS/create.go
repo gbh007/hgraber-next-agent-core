@@ -7,12 +7,19 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
+	"github.com/gbh007/hgraber-next-agent-core/metrics"
 	"github.com/google/uuid"
 )
 
 func (s *Storage) Create(ctx context.Context, fileID uuid.UUID, body io.Reader) error {
+	startAt := time.Now()
+	defer func() {
+		metrics.RegisterFSActionTime("create", time.Since(startAt))
+	}()
+
 	filepath := s.filepath(fileID)
 
 	info, err := os.Stat(filepath)
