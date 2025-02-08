@@ -54,8 +54,8 @@ func (c *Controller[T]) Start(parentCtx context.Context) (chan struct{}, error) 
 	go func() {
 		defer close(done)
 
-		c.logger.InfoContext(parentCtx, "api server start")
-		defer c.logger.InfoContext(parentCtx, "api server stop")
+		c.logger.InfoContext(parentCtx, "debug server start")
+		defer c.logger.InfoContext(parentCtx, "debug server stop")
 
 		err := echoRouter.StartServer(server)
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -65,7 +65,7 @@ func (c *Controller[T]) Start(parentCtx context.Context) (chan struct{}, error) 
 
 	go func() {
 		<-parentCtx.Done()
-		c.logger.InfoContext(parentCtx, "stopping api server")
+		c.logger.InfoContext(parentCtx, "stopping debug server")
 
 		shutdownCtx, cancel := context.WithTimeout(context.WithoutCancel(parentCtx), time.Second*10)
 		defer cancel()
