@@ -1,6 +1,8 @@
 package metrics
 
 import (
+	"time"
+
 	"github.com/gbh007/hgraber-next-agent-core/version"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -23,5 +25,5 @@ var versionInfo = promauto.NewGauge(prometheus.GaugeOpts{
 })
 
 func init() {
-	versionInfo.Set(1)
+	versionInfo.Set(float64(time.Now().Unix()))
 }
