@@ -34,9 +34,8 @@ func convertBooksCheckResultResult(result []entities.AgentBookCheckResult) []age
 		switch {
 		case v.IsPossible:
 			return agentapi.BooksCheckResultResultItem{
-				URL:                v.URL,
-				Result:             agentapi.BooksCheckResultResultItemResultOk,
-				PossibleDuplicates: v.PossibleDuplicates,
+				URL:    v.URL,
+				Result: agentapi.BooksCheckResultResultItemResultOk,
 			}
 
 		case v.IsUnsupported:

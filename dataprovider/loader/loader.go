@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"strings"
 	"time"
 
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
@@ -63,22 +62,10 @@ func New(
 	}
 }
 
-func (l *Loader) Prefixes() []string {
-	prefixes := make([]string, 0, len(l.parsers))
-
-	for _, p := range l.parsers {
-		prefixes = append(prefixes, p.Prefixes()...)
-	}
-
-	return prefixes
-}
-
 func (l *Loader) getParser(u string) (hgraber.Parser, error) {
 	for _, p := range l.parsers {
-		for _, prefix := range p.Prefixes() {
-			if strings.HasPrefix(u, prefix) {
-				return p, nil
-			}
+		if p.CanParse(u) {
+			return p, nil
 		}
 	}
 
@@ -156,26 +143,4 @@ func (l *Loader) AllBooks(ctx context.Context, u string) ([]string, error) {
 	}
 
 	return data, nil
-}
-
-// FIXME: перенести логику работы с зеркалами, на мастер систему
-func (l *Loader) Collisions(ctx context.Context, u string) ([]string, error) {
-	p, err := l.getParser(u)
-	if err != nil {
-		return nil, fmt.Errorf("get parser: %w", err)
-	}
-
-	for prefix, replacements := range p.Collisions() {
-		if strings.HasPrefix(u, prefix) {
-			res := make([]string, 0, len(replacements))
-
-			for _, v := range replacements {
-				res = append(res, strings.Replace(u, prefix, v, 1))
-			}
-
-			return res, nil
-		}
-	}
-
-	return []string{}, nil // Коллизий нет
 }

@@ -2,7 +2,6 @@ package agent
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
@@ -34,23 +33,9 @@ func (uc *UseCase) CheckBooks(ctx context.Context, urls []url.URL) ([]entities.A
 			continue
 		}
 
-		collisions, err := uc.loader.Collisions(ctx, stringURL)
-		if err != nil {
-			return nil, fmt.Errorf("url collision (%s): %w", stringURL, err)
-		}
-
 		singleResult := entities.AgentBookCheckResult{
 			URL:        u,
 			IsPossible: true,
-		}
-
-		for _, rawUrl := range collisions {
-			collisionUrl, err := url.Parse(rawUrl)
-			if err != nil {
-				return nil, fmt.Errorf("url collision parse (%s) / (%s): %w", stringURL, rawUrl, err)
-			}
-
-			singleResult.PossibleDuplicates = append(singleResult.PossibleDuplicates, *collisionUrl)
 		}
 
 		result = append(result, singleResult)

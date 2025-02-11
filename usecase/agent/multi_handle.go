@@ -29,23 +29,9 @@ func (uc *UseCase) MultiHandle(ctx context.Context, multiUrl url.URL) ([]entitie
 			return nil, fmt.Errorf("url parse (%s): %w", stringURL, err)
 		}
 
-		collisions, err := uc.loader.Collisions(ctx, stringURL)
-		if err != nil {
-			return nil, fmt.Errorf("url collision (%s): %w", stringURL, err)
-		}
-
 		singleResult := entities.AgentBookCheckResult{
 			URL:        *u,
 			IsPossible: true,
-		}
-
-		for _, rawUrl := range collisions {
-			collisionUrl, err := url.Parse(rawUrl)
-			if err != nil {
-				return nil, fmt.Errorf("url collision parse (%s) / (%s): %w", stringURL, rawUrl, err)
-			}
-
-			singleResult.PossibleDuplicates = append(singleResult.PossibleDuplicates, *collisionUrl)
 		}
 
 		result = append(result, singleResult)

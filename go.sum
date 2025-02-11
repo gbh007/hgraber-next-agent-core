@@ -18,6 +18,8 @@ github.com/felixge/httpsnoop v1.0.4 h1:NFTV2Zj1bL4mc9sqWACXbQFVBBg2W3GPvqp8/ESS2
 github.com/felixge/httpsnoop v1.0.4/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/gbh007/hgraber-next v0.0.3-0.20250207054642-82731b082790 h1:dRrdEBEIeOvzKjG+glWgMx4uAYX/jw07LkIpAiIlk1Q=
 github.com/gbh007/hgraber-next v0.0.3-0.20250207054642-82731b082790/go.mod h1:+RvPmDuLXIlLmoKEd68ZQp1eOrpTVZo2bad8H3wIMcQ=
+github.com/gbh007/hgraber-next v0.0.3-0.20250211055425-3a2723510fc8 h1:L4dJBQaHGatkGyyWdHfGlnhgIMeL0T6AdsFxPrL1n14=
+github.com/gbh007/hgraber-next v0.0.3-0.20250211055425-3a2723510fc8/go.mod h1:+RvPmDuLXIlLmoKEd68ZQp1eOrpTVZo2bad8H3wIMcQ=
 github.com/ghodss/yaml v1.0.0 h1:wQHKEahhL6wmXdzwWG11gIVCkOv05bNOh+Rxn0yngAk=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/glebarez/go-sqlite v1.22.0 h1:uAcMJhaA6r3LHMTFgP0SifzgXg46yJkgxqyuyec+ruQ=

@@ -29,7 +29,6 @@ type AgentBookCheckResult struct {
 	IsUnsupported      bool
 	IsPossible         bool
 	HasError           bool
-	PossibleDuplicates []url.URL
 	ErrorReason        string
 }
 

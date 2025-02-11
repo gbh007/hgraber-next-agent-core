@@ -15,8 +15,7 @@ var (
 type Parser interface {
 	Name() string
 	Load(ctx context.Context, u string) (BookParser, error)
-	Prefixes() []string
-	Collisions() map[string][]string
+	CanParse(u string) bool
 	AllBooks(ctx context.Context, u string) ([]string, error)
 	LoadImage(ctx context.Context, u string, bookUrl string) (io.ReadCloser, error)
 }

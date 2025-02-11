@@ -25,36 +25,16 @@ type Requester interface {
 }
 
 type CoreParser struct {
-	Requester  Requester
-	prefixes   []string
-	collisions map[string][]string
-	name       string
+	Requester Requester
+	prefixes  []string
+	name      string
 }
 
 func NewCoreParser(requester Requester, prefixes []string, name string) CoreParser {
-	collisions := make(map[string][]string, len(prefixes))
-
-	if len(prefixes) > 1 { // Если префикс только 1, то коллизий быть не может.
-		for i1, pref1 := range prefixes {
-			values := make([]string, 0, len(prefixes)-1)
-
-			for i2, pref2 := range prefixes {
-				if i1 == i2 {
-					continue
-				}
-
-				values = append(values, pref2)
-			}
-
-			collisions[pref1] = values
-		}
-	}
-
 	return CoreParser{
-		Requester:  requester,
-		prefixes:   prefixes,
-		collisions: collisions,
-		name:       name,
+		Requester: requester,
+		prefixes:  prefixes,
+		name:      name,
 	}
 }
 
@@ -66,12 +46,14 @@ func (cp CoreParser) Load(ctx context.Context, u string) (hgraber.BookParser, er
 	return nil, fmt.Errorf("unimplemented in core parser")
 }
 
-func (cp CoreParser) Prefixes() []string {
-	return cp.prefixes
-}
+func (cp CoreParser) CanParse(u string) bool {
+	for _, prefix := range cp.prefixes {
+		if strings.HasPrefix(u, prefix) {
+			return true
+		}
+	}
 
-func (cp CoreParser) Collisions() map[string][]string {
-	return cp.collisions
+	return false
 }
 
 func (cp CoreParser) AllBooks(ctx context.Context, u string) ([]string, error) {
