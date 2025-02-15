@@ -1,5 +1,5 @@
 //go:build !linux
 
-package dataFS
+package datafs
 
 func getAvailableSize(_ string) int64 { return 0 }
