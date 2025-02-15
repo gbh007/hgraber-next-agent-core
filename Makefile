@@ -49,3 +49,4 @@ scan: create_build_dir
 .PHONY: update-dep
 update-dep:
 	go get -u github.com/gbh007/hgraber-next@master
+	go mod tidy

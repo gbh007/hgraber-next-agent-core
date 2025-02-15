@@ -3,14 +3,14 @@ package config
 import "time"
 
 type Config[T any] struct {
-	API         API         `envconfig:"API" yaml:"api"`
-	DebugServer DebugServer `envconfig:"DEBUG_SERVER" yaml:"debug_server"`
-	Application Application `envconfig:"APPLICATION" yaml:"application"`
-	Parsers     *T          `envconfig:"PARSERS" yaml:"parsers"`
-	FSBase      FSBase      `envconfig:"FS_BASE" yaml:"fs_base"`
-	Sqlite      Sqlite      `envconfig:"SQLITE" yaml:"sqlite"`
-	ZipScanner  ZipScanner  `envconfig:"ZIP_SCANNER" yaml:"zip_scanner"`
-	Highway     Highway     `envconfig:"HIGHWAY" yaml:"highway"`
+	API         API         `yaml:"api" envconfig:"API"`
+	DebugServer DebugServer `yaml:"debug_server" envconfig:"DEBUG_SERVER"`
+	Application Application `yaml:"application" envconfig:"APPLICATION"`
+	Parsers     *T          `yaml:"parsers" envconfig:"PARSERS"`
+	FSBase      FSBase      `yaml:"fs_base" envconfig:"FS_BASE"`
+	Sqlite      Sqlite      `yaml:"sqlite" envconfig:"SQLITE"`
+	ZipScanner  ZipScanner  `yaml:"zip_scanner" envconfig:"ZIP_SCANNER"`
+	Highway     Highway     `yaml:"highway" envconfig:"HIGHWAY"`
 }
 
 func DefaultConfig[T any](defaultParsers func() *T) Config[T] {
@@ -26,11 +26,18 @@ func DefaultConfig[T any](defaultParsers func() *T) Config[T] {
 }
 
 type Application struct {
-	Debug           bool          `envconfig:"DEBUG" yaml:"debug"`
-	TraceEndpoint   string        `envconfig:"TRACE_ENDPOINT" yaml:"trace_endpoint"`
-	ClientTimeout   time.Duration `envconfig:"CLIENT_TIMEOUT" yaml:"client_timeout"`
-	ServiceName     string        `envconfig:"SERVICE_NAME" yaml:"service_name"`
-	UseUnsafeCloser bool          `envconfig:"USE_UNSAFE_CLOSER" yaml:"use_unsafe_closer"`
+	Debug           bool          `yaml:"debug" envconfig:"DEBUG"`
+	TraceEndpoint   string        `yaml:"trace_endpoint" envconfig:"TRACE_ENDPOINT"`
+	ClientTimeout   time.Duration `yaml:"client_timeout" envconfig:"CLIENT_TIMEOUT"`
+	ServiceName     string        `yaml:"service_name" envconfig:"SERVICE_NAME"`
+	UseUnsafeCloser bool          `yaml:"use_unsafe_closer" envconfig:"USE_UNSAFE_CLOSER"`
+	Pyroscope       Pyroscope     `yaml:"pyroscope" envconfig:"PYROSCOPE"`
+}
+
+type Pyroscope struct {
+	Endpoint string `yaml:"endpoint" envconfig:"ENDPOINT"`
+	Debug    bool   `yaml:"debug" envconfig:"DEBUG"`
+	Rate     int    `yaml:"rate" envconfig:"RATE"`
 }
 
 func DefaultApplication() Application {
@@ -83,8 +90,8 @@ func DefaultDebugServer() DebugServer {
 }
 
 type Parsers struct {
-	HG4Token string   `envconfig:"HG4_TOKEN" yaml:"hg4_token"`
-	Enabled  []string `envconfig:"ENABLED" yaml:"enabled"`
+	HG4Token string   `yaml:"hg4_token" envconfig:"HG4_TOKEN"`
+	Enabled  []string `yaml:"enabled" envconfig:"ENABLED"`
 }
 
 func DefaultParsers() *Parsers {
@@ -98,10 +105,10 @@ func DefaultParsers() *Parsers {
 }
 
 type FSBase struct {
-	ExportPath          string `envconfig:"EXPORT_PATH" yaml:"export_path"`
-	FilePath            string `envconfig:"FILE_PATH" yaml:"file_path"`
-	EnableDeduplication bool   `envconfig:"ENABLE_DEDUPLICATION" yaml:"enable_deduplication"`
-	ExportLimitOnFolder int    `envconfig:"EXPORT_LIMIT_ON_FOLDER" yaml:"export_limit_on_folder"`
+	ExportPath          string `yaml:"export_path" envconfig:"EXPORT_PATH"`
+	FilePath            string `yaml:"file_path" envconfig:"FILE_PATH"`
+	EnableDeduplication bool   `yaml:"enable_deduplication" envconfig:"ENABLE_DEDUPLICATION"`
+	ExportLimitOnFolder int    `yaml:"export_limit_on_folder" envconfig:"EXPORT_LIMIT_ON_FOLDER"`
 }
 
 func DefaultFSBase() FSBase {
@@ -109,7 +116,7 @@ func DefaultFSBase() FSBase {
 }
 
 type Sqlite struct {
-	FilePath string `envconfig:"FILE_PATH" yaml:"file_path"`
+	FilePath string `yaml:"file_path" envconfig:"FILE_PATH"`
 }
 
 func DefaultSqlite() Sqlite {
@@ -117,8 +124,8 @@ func DefaultSqlite() Sqlite {
 }
 
 type ZipScanner struct {
-	MasterAddr  string `envconfig:"MASTER_ADDR" yaml:"master_addr"`
-	MasterToken string `envconfig:"MASTER_TOKEN" yaml:"master_token"`
+	MasterAddr  string `yaml:"master_addr" envconfig:"MASTER_ADDR"`
+	MasterToken string `yaml:"master_token" envconfig:"MASTER_TOKEN"`
 }
 
 func DefaultZipScanner() ZipScanner {
@@ -126,8 +133,8 @@ func DefaultZipScanner() ZipScanner {
 }
 
 type Highway struct {
-	PrivateKey    string        `envconfig:"PRIVATE_KEY" yaml:"private_key"`
-	TokenLifetime time.Duration `envconfig:"TOKEN_LIFETIME" yaml:"token_lifetime"`
+	PrivateKey    string        `yaml:"private_key" envconfig:"PRIVATE_KEY"`
+	TokenLifetime time.Duration `yaml:"token_lifetime" envconfig:"TOKEN_LIFETIME"`
 }
 
 func DefaultHighway() Highway {

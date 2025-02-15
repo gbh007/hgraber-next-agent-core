@@ -3,9 +3,10 @@ module github.com/gbh007/hgraber-next-agent-core
 go 1.23.3
 
 require (
-	github.com/gbh007/hgraber-next v0.0.3-0.20250211055425-3a2723510fc8
+	github.com/gbh007/hgraber-next v0.0.3-0.20250215102541-9b68373a88a5
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/google/uuid v1.6.0
+	github.com/grafana/pyroscope-go v1.2.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo/v4 v4.13.3
@@ -35,6 +36,7 @@ require (
 	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/grafana/pyroscope-go/godeltaprof v0.1.8 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect

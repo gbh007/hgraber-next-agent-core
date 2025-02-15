@@ -13,6 +13,10 @@ application:
   client_timeout: 1m0s
   service_name: hgraber-next-agent-local
   use_unsafe_closer: false
+  pyroscope:
+    endpoint: ""
+    debug: false
+    rate: 5
 parsers:
   hg4_token: ""
   enabled:

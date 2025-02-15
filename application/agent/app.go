@@ -37,6 +37,20 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 	logger := initLogger(cfg)
 	logger.InfoContext(ctx, "initializing system")
 
+	if cfg.Application.Pyroscope.Endpoint != "" {
+		profiler, err := initPyroscope(logger, cfg)
+		if err != nil {
+			logger.ErrorContext(
+				ctx, "fail init pyroscope",
+				slog.Any("error", err),
+			)
+
+			os.Exit(1)
+		}
+
+		defer profiler.Stop() //nolint:errcheck // будет исправлено позднее
+	}
+
 	if cfg.Application.TraceEndpoint != "" {
 		err := initTrace(
 			ctx,
