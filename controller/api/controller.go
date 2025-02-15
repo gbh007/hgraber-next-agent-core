@@ -23,8 +23,8 @@ type ParsingUseCases interface {
 	MultiHandle(ctx context.Context, multiUrl url.URL) ([]entities.AgentBookCheckResult, error)
 }
 
-type ExportUseCases interface {
-	Create(ctx context.Context, data entities.ExportData) error
+type ImportUseCases interface {
+	Create(ctx context.Context, data entities.ImportData) error
 }
 
 type FileUseCases interface {
@@ -57,7 +57,7 @@ type Controller struct {
 
 	ogenServer *agentapi.Server
 
-	exportUseCase   ExportUseCases
+	importUseCase   ImportUseCases
 	fileUseCase     FileUseCases
 	parsingUseCases ParsingUseCases
 	highwayUseCase  HighwayUseCases
@@ -73,7 +73,7 @@ func New(
 	logger *slog.Logger,
 	tracer trace.Tracer,
 	parsingUseCases ParsingUseCases,
-	exportUseCase ExportUseCases,
+	importUseCase ImportUseCases,
 	fileUseCase FileUseCases,
 	highwayUseCase HighwayUseCases,
 	parserCodes []string,
@@ -91,7 +91,7 @@ func New(
 		enabledModules: make([]string, 0, 3),
 
 		parsingUseCases: parsingUseCases,
-		exportUseCase:   exportUseCase,
+		importUseCase:   importUseCase,
 		fileUseCase:     fileUseCase,
 		highwayUseCase:  highwayUseCase,
 	}
@@ -100,8 +100,8 @@ func New(
 		c.enabledModules = append(c.enabledModules, "parsing")
 	}
 
-	if c.exportUseCase != nil {
-		c.enabledModules = append(c.enabledModules, "export")
+	if c.importUseCase != nil {
+		c.enabledModules = append(c.enabledModules, "import")
 	}
 
 	if c.fileUseCase != nil {

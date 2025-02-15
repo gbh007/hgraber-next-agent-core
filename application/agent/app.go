@@ -10,17 +10,17 @@ import (
 	"github.com/gbh007/hgraber-next-agent-core/controller/api"
 	"github.com/gbh007/hgraber-next-agent-core/controller/async"
 	"github.com/gbh007/hgraber-next-agent-core/controller/debugserver"
-	"github.com/gbh007/hgraber-next-agent-core/dataprovider/dataFS"
-	"github.com/gbh007/hgraber-next-agent-core/dataprovider/exportFS"
+	"github.com/gbh007/hgraber-next-agent-core/dataprovider/datafs"
+	"github.com/gbh007/hgraber-next-agent-core/dataprovider/importfs"
 	"github.com/gbh007/hgraber-next-agent-core/dataprovider/loader"
-	"github.com/gbh007/hgraber-next-agent-core/dataprovider/masterAPI"
+	"github.com/gbh007/hgraber-next-agent-core/dataprovider/masterapi"
 	"github.com/gbh007/hgraber-next-agent-core/dataprovider/storage"
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
 	"github.com/gbh007/hgraber-next-agent-core/entities"
 	agentUC "github.com/gbh007/hgraber-next-agent-core/usecase/agent"
-	"github.com/gbh007/hgraber-next-agent-core/usecase/exportAPI"
-	"github.com/gbh007/hgraber-next-agent-core/usecase/exportDeduplicator"
 	"github.com/gbh007/hgraber-next-agent-core/usecase/highway"
+	"github.com/gbh007/hgraber-next-agent-core/usecase/importapi"
+	"github.com/gbh007/hgraber-next-agent-core/usecase/importdeduplicator"
 	"github.com/gbh007/hgraber-next/pkg"
 	"go.opentelemetry.io/otel"
 )
@@ -72,14 +72,14 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 	async := async.New(logger)
 
 	var (
-		exportStorage   api.ExportUseCases
+		importStorage   api.ImportUseCases
 		fileStorage     api.FileUseCases
 		agentUseCases   api.ParsingUseCases
 		highwayUseCases api.HighwayUseCases
 
-		exportStorageRaw *exportFS.Storage
+		importStorageRaw *importfs.Storage
 		dbRaw            *storage.Storage
-		mAPI             *masterAPI.Client
+		mAPI             *masterapi.Client
 	)
 
 	parsers, err := parserInit(ctx, logger, cfg)
@@ -101,27 +101,27 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 		)
 	}
 
-	if cfg.FSBase.ExportPath != "" {
-		exportStorageRaw, err = exportFS.New(cfg.FSBase.ExportPath, logger, cfg.FSBase.ExportLimitOnFolder, cfg.Application.UseUnsafeCloser)
+	if cfg.FSBase.ImportPath != "" {
+		importStorageRaw, err = importfs.New(cfg.FSBase.ImportPath, logger, cfg.FSBase.ImportLimitOnFolder, cfg.Application.UseUnsafeCloser)
 		if err != nil {
 			logger.ErrorContext(
-				ctx, "fail init export fs",
+				ctx, "fail init import fs",
 				slog.Any("error", err),
 			)
 
 			os.Exit(1)
 		}
 
-		exportStorage = exportStorageRaw
+		importStorage = importStorageRaw
 
 		logger.DebugContext(
-			ctx, "use local export storage",
-			slog.String("path", cfg.FSBase.ExportPath),
+			ctx, "use local import storage",
+			slog.String("path", cfg.FSBase.ImportPath),
 		)
 	}
 
 	if cfg.FSBase.FilePath != "" {
-		fileStorage, err = dataFS.New(cfg.FSBase.FilePath, logger)
+		fileStorage, err = datafs.New(cfg.FSBase.FilePath, logger)
 		if err != nil {
 			logger.ErrorContext(
 				ctx, "fail init data fs",
@@ -150,7 +150,7 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 	}
 
 	if cfg.ZipScanner.MasterAddr != "" {
-		mAPI, err = masterAPI.New(cfg.ZipScanner.MasterAddr, cfg.ZipScanner.MasterToken)
+		mAPI, err = masterapi.New(cfg.ZipScanner.MasterAddr, cfg.ZipScanner.MasterToken)
 		if err != nil {
 			logger.ErrorContext(
 				ctx, "fail init master api",
@@ -162,13 +162,13 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 	}
 
 	if needScan {
-		if dbRaw == nil || exportStorageRaw == nil || mAPI == nil {
+		if dbRaw == nil || importStorageRaw == nil || mAPI == nil {
 			logger.ErrorContext(ctx, "invalid scan dependencies")
 
 			os.Exit(1)
 		}
 
-		err = exportDeduplicator.New(logger, exportStorageRaw, dbRaw, mAPI).ScanZips(ctx)
+		err = importdeduplicator.New(logger, importStorageRaw, dbRaw, mAPI).ScanZips(ctx)
 		if err != nil {
 			logger.ErrorContext(
 				ctx, "fail scan zips",
@@ -181,8 +181,8 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 		return
 	}
 
-	if cfg.FSBase.EnableDeduplication && dbRaw != nil && exportStorageRaw != nil {
-		exportStorage = exportAPI.New(logger, dbRaw, exportStorageRaw)
+	if cfg.FSBase.EnableDeduplication && dbRaw != nil && importStorageRaw != nil {
+		importStorage = importapi.New(logger, dbRaw, importStorageRaw)
 
 		logger.DebugContext(ctx, "use export deduplication")
 	}
@@ -216,7 +216,7 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 			logger,
 			tracer,
 			agentUseCases,
-			exportStorage,
+			importStorage,
 			fileStorage,
 			highwayUseCases,
 			parserNames,

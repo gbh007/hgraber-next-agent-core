@@ -1,4 +1,4 @@
-package exportFS
+package importfs
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/gbh007/hgraber-next-agent-core/metrics"
 )
 
-func (s *Storage) Create(ctx context.Context, data entities.ExportData) error {
+func (s *Storage) Create(ctx context.Context, data entities.ImportData) error {
 	_, err := s.create(ctx, data)
 	if err != nil {
 		return err
@@ -21,14 +21,14 @@ func (s *Storage) Create(ctx context.Context, data entities.ExportData) error {
 	return nil
 }
 
-func (s *Storage) CreateExport(ctx context.Context, data entities.ExportData) (string, error) {
+func (s *Storage) CreateImport(ctx context.Context, data entities.ImportData) (string, error) {
 	return s.create(ctx, data)
 }
 
-func (s *Storage) create(ctx context.Context, data entities.ExportData) (string, error) {
+func (s *Storage) create(ctx context.Context, data entities.ImportData) (string, error) {
 	startAt := time.Now()
 	defer func() {
-		metrics.RegisterFSActionTime("create_export", time.Since(startAt))
+		metrics.RegisterFSActionTime("create_import", time.Since(startAt))
 	}()
 
 	var (

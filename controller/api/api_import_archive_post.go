@@ -8,9 +8,9 @@ import (
 	"github.com/gbh007/hgraber-next/openapi/agentapi"
 )
 
-func (c *Controller) APIExportArchivePost(ctx context.Context, req agentapi.APIExportArchivePostReq, params agentapi.APIExportArchivePostParams) (agentapi.APIExportArchivePostRes, error) {
-	if c.exportUseCase == nil {
-		return &agentapi.APIExportArchivePostBadRequest{
+func (c *Controller) APIImportArchivePost(ctx context.Context, req agentapi.APIImportArchivePostReq, params agentapi.APIImportArchivePostParams) (agentapi.APIImportArchivePostRes, error) {
+	if c.importUseCase == nil {
+		return &agentapi.APIImportArchivePostBadRequest{
 			InnerCode: ValidationCode,
 			Details:   agentapi.NewOptString("unsupported api"),
 		}, nil
@@ -22,18 +22,18 @@ func (c *Controller) APIExportArchivePost(ctx context.Context, req agentapi.APIE
 		u = &params.BookURL.Value
 	}
 
-	err := c.exportUseCase.Create(ctx, entities.ExportData{
+	err := c.importUseCase.Create(ctx, entities.ImportData{
 		BookID:   params.BookID,
 		BookName: params.BookName,
 		Body:     req.Data,
 		BookURL:  u,
 	})
 	if err != nil {
-		return &agentapi.APIExportArchivePostInternalServerError{
+		return &agentapi.APIImportArchivePostInternalServerError{
 			InnerCode: ExportUseCaseCode,
 			Details:   agentapi.NewOptString(err.Error()),
 		}, nil
 	}
 
-	return &agentapi.APIExportArchivePostNoContent{}, nil
+	return &agentapi.APIImportArchivePostNoContent{}, nil
 }

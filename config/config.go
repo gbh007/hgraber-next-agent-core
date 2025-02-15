@@ -105,10 +105,10 @@ func DefaultParsers() *Parsers {
 }
 
 type FSBase struct {
-	ExportPath          string `yaml:"export_path" envconfig:"EXPORT_PATH"`
+	ImportPath          string `yaml:"import_path" envconfig:"IMPORT_PATH"`
 	FilePath            string `yaml:"file_path" envconfig:"FILE_PATH"`
 	EnableDeduplication bool   `yaml:"enable_deduplication" envconfig:"ENABLE_DEDUPLICATION"`
-	ExportLimitOnFolder int    `yaml:"export_limit_on_folder" envconfig:"EXPORT_LIMIT_ON_FOLDER"`
+	ImportLimitOnFolder int    `yaml:"import_limit_on_folder" envconfig:"IMPORT_LIMIT_ON_FOLDER"`
 }
 
 func DefaultFSBase() FSBase {

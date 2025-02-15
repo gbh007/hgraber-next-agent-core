@@ -9,14 +9,14 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Storage) CreateExport(ctx context.Context, info entities.ExportInfo) error {
+func (s *Storage) CreateImport(ctx context.Context, info entities.ImportInfo) error {
 	_, err := s.db.ExecContext(
 		ctx,
-		`INSERT INTO export_infos (book_id, book_url, relative_path, exported_at) VALUES (?,?,?,?) ON CONFLICT DO NOTHING;`,
+		`INSERT INTO import_infos (book_id, book_url, relative_path, imported_at) VALUES (?,?,?,?) ON CONFLICT DO NOTHING;`,
 		info.BookID,
 		URLToDB(info.BookURL),
 		info.FSPath,
-		info.ExportedAt.Unix(),
+		info.ImportedAt.Unix(),
 	)
 	if err != nil {
 		return err
@@ -25,10 +25,10 @@ func (s *Storage) CreateExport(ctx context.Context, info entities.ExportInfo) er
 	return nil
 }
 
-func (s *Storage) ExportedCountByID(ctx context.Context, bookID uuid.UUID) (int, error) {
+func (s *Storage) ImportedCountByID(ctx context.Context, bookID uuid.UUID) (int, error) {
 	var c sql.NullInt64
 
-	err := s.db.GetContext(ctx, &c, `SELECT COUNT(*) FROM export_infos WHERE book_id = ?;`, bookID)
+	err := s.db.GetContext(ctx, &c, `SELECT COUNT(*) FROM import_infos WHERE book_id = ?;`, bookID)
 	if err != nil {
 		return 0, err
 	}
@@ -36,10 +36,10 @@ func (s *Storage) ExportedCountByID(ctx context.Context, bookID uuid.UUID) (int,
 	return int(c.Int64), nil
 }
 
-func (s *Storage) ExportedCountByURL(ctx context.Context, u url.URL) (int, error) {
+func (s *Storage) ImportedCountByURL(ctx context.Context, u url.URL) (int, error) {
 	var c sql.NullInt64
 
-	err := s.db.GetContext(ctx, &c, `SELECT COUNT(*) FROM export_infos WHERE book_url = ?;`, u.String())
+	err := s.db.GetContext(ctx, &c, `SELECT COUNT(*) FROM import_infos WHERE book_url = ?;`, u.String())
 	if err != nil {
 		return 0, err
 	}
@@ -47,10 +47,10 @@ func (s *Storage) ExportedCountByURL(ctx context.Context, u url.URL) (int, error
 	return int(c.Int64), nil
 }
 
-func (s *Storage) ExportedCountByRelativePath(ctx context.Context, path string) (int, error) {
+func (s *Storage) ImportedCountByRelativePath(ctx context.Context, path string) (int, error) {
 	var c sql.NullInt64
 
-	err := s.db.GetContext(ctx, &c, `SELECT COUNT(*) FROM export_infos WHERE relative_path = ?;`, path)
+	err := s.db.GetContext(ctx, &c, `SELECT COUNT(*) FROM import_infos WHERE relative_path = ?;`, path)
 	if err != nil {
 		return 0, err
 	}

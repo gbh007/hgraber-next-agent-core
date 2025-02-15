@@ -1,6 +1,6 @@
 //go:build linux
 
-package dataFS
+package datafs
 
 import "golang.org/x/sys/unix"
 

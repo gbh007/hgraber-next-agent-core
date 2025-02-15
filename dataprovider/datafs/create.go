@@ -1,4 +1,4 @@
-package dataFS
+package datafs
 
 import (
 	"context"

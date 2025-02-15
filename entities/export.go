@@ -8,14 +8,14 @@ import (
 	"github.com/google/uuid"
 )
 
-type ExportInfo struct {
+type ImportInfo struct {
 	BookID     uuid.UUID
 	BookURL    *url.URL
 	FSPath     string
-	ExportedAt time.Time
+	ImportedAt time.Time
 }
 
-type ExportData struct {
+type ImportData struct {
 	BookID   uuid.UUID
 	BookName string
 	BookURL  *url.URL

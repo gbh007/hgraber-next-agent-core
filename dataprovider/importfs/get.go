@@ -1,4 +1,4 @@
-package exportFS
+package importfs
 
 import (
 	"bytes"
@@ -16,12 +16,12 @@ import (
 func (s *Storage) Get(ctx context.Context, relativePath string) (io.Reader, error) {
 	startAt := time.Now()
 	defer func() {
-		metrics.RegisterFSActionTime("get_export", time.Since(startAt))
+		metrics.RegisterFSActionTime("get_import", time.Since(startAt))
 	}()
 
 	f, err := os.Open(path.Join(s.fsPath, relativePath))
 	if err != nil {
-		return nil, fmt.Errorf("export fs: open: %w", err)
+		return nil, fmt.Errorf("import fs: open: %w", err)
 	}
 
 	if s.useUnsafeCloser {
@@ -32,7 +32,7 @@ func (s *Storage) Get(ctx context.Context, relativePath string) (io.Reader, erro
 
 	data, err := io.ReadAll(f)
 	if err != nil {
-		return nil, fmt.Errorf("export fs: read all: %w", err)
+		return nil, fmt.Errorf("import fs: read all: %w", err)
 	}
 
 	return bytes.NewReader(data), nil

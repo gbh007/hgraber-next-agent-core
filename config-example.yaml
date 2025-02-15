@@ -23,10 +23,10 @@ parsers:
     - mock
     - hgraber_local
 fs_base:
-  export_path: .hidden/exported
+  import_path: .hidden/imported
   file_path: .hidden/filedata
   enable_deduplication: true
-  export_limit_on_folder: 50
+  import_limit_on_folder: 50
 sqlite:
   file_path: db.sqlite
 zip_scanner:
