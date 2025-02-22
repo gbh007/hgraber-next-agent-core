@@ -36,12 +36,8 @@ func parseConfig[T any]() (config.Config[T], bool, error) {
 
 func initLogger[T any](cfg config.Config[T]) *slog.Logger {
 	slogOpt := &slog.HandlerOptions{
-		AddSource: cfg.Application.Debug,
-		Level:     slog.LevelInfo,
-	}
-
-	if cfg.Application.Debug {
-		slogOpt.Level = slog.LevelDebug
+		AddSource: cfg.Log.IncludeSource,
+		Level:     cfg.Log.SlogLevel(),
 	}
 
 	return slog.New(

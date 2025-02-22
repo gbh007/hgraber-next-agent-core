@@ -1,3 +1,6 @@
+log:
+  include_source: false
+  level: info
 api:
   addr: 127.0.0.1:8080
   token: agent-token
@@ -8,7 +11,6 @@ debug_server:
   log_error_handler: true
   debug: false
 application:
-  debug: true
   trace_endpoint: ""
   client_timeout: 1m0s
   service_name: hgraber-next-agent-local

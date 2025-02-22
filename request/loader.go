@@ -66,7 +66,6 @@ func (r *Requester) requestBuffer(ctx context.Context, URL string, headers http.
 	}
 
 	if err != nil {
-		r.logger.ErrorContext(ctx, err.Error())
 		return nil, "", err
 	}
 
@@ -86,7 +85,6 @@ func (r *Requester) requestBuffer(ctx context.Context, URL string, headers http.
 	response, err := r.client.Do(req)
 
 	if err != nil {
-		r.logger.ErrorContext(ctx, err.Error())
 		return nil, "", err
 	}
 
@@ -98,16 +96,11 @@ func (r *Requester) requestBuffer(ctx context.Context, URL string, headers http.
 	}()
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		err = fmt.Errorf("%s ошибка %s", URL, response.Status)
-		r.logger.ErrorContext(ctx, err.Error())
-
-		return nil, "", err
+		return nil, "", fmt.Errorf("load %s: unsuccess status: %s", URL, response.Status)
 	}
 
 	_, err = buff.ReadFrom(response.Body)
 	if err != nil {
-		r.logger.ErrorContext(ctx, err.Error())
-
 		return nil, "", err
 	}
 
