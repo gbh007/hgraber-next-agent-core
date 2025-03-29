@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os/signal"
 	"syscall"
@@ -9,6 +10,7 @@ import (
 	"github.com/gbh007/hgraber-next-agent-core/application/agent"
 	"github.com/gbh007/hgraber-next-agent-core/config"
 	"github.com/gbh007/hgraber-next-agent-core/dataprovider/loader"
+	"github.com/gbh007/hgraber-next-agent-core/dataprovider/webcache"
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
 )
 
@@ -22,11 +24,28 @@ func main() {
 	)
 	defer cancel()
 
-	agent.Serve(ctx, func(ctx context.Context, logger *slog.Logger, cfg config.Config[config.Parsers]) ([]hgraber.Parser, error) {
+	agent.Serve(ctx, func(
+		ctx context.Context,
+		logger *slog.Logger,
+		cfg config.Config[config.Parsers],
+		async agent.Async,
+	) ([]hgraber.Parser, error) {
 		if cfg.Parsers == nil {
 			logger.DebugContext(ctx, "nil parser config, skipping")
 
 			return []hgraber.Parser{}, nil
+		}
+
+		var cache loader.Cache
+
+		if cfg.Parsers.Cache.Enabled {
+			wc, err := webcache.New(cfg.Parsers.Cache.Path, logger, cfg.Parsers.Cache.TTL, cfg.Parsers.Cache.CleanInterval)
+			if err != nil {
+				return nil, fmt.Errorf("create web cache: %w", err)
+			}
+
+			async.RegisterRunner(ctx, wc)
+			cache = wc
 		}
 
 		return loader.NewDefaultParsers(
@@ -34,6 +53,7 @@ func main() {
 			cfg.Parsers.HG4Token,
 			cfg.Application.ClientTimeout,
 			cfg.Parsers.Enabled,
+			cache,
 		), nil
 	})
 }

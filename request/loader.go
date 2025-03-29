@@ -1,30 +1,33 @@
 package request
 
 import (
-	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
 	"time"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel/propagation"
 )
 
 const defaultUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
 
-type Requester struct {
-	client *http.Client
+type cache interface {
+	SetString(ctx context.Context, u, v string)
+	GetString(ctx context.Context, u string) (string, bool)
+}
 
+type Requester struct {
 	logger *slog.Logger
+	cache  cache
+	client *http.Client
 }
 
 func New(
 	logger *slog.Logger,
 	timeout time.Duration,
 	transport http.RoundTripper,
+	cache cache,
 ) *Requester {
 	if transport == nil {
 		transport = http.DefaultTransport
@@ -39,94 +42,46 @@ func New(
 			),
 		},
 		logger: logger,
+		cache:  cache,
 	}
-}
-
-type noopPropagator struct{}
-
-func (noopPropagator) Inject(ctx context.Context, carrier propagation.TextMapCarrier) {}
-func (noopPropagator) Extract(ctx context.Context, carrier propagation.TextMapCarrier) context.Context {
-	return ctx
-}
-func (noopPropagator) Fields() []string { return nil }
-
-// requestBuffer запрашивает данные по урле и возвращает их в виде буффера
-func (r *Requester) requestBuffer(ctx context.Context, URL string, headers http.Header, body io.Reader) (*bytes.Buffer, string, error) {
-	buff := new(bytes.Buffer)
-
-	var (
-		req *http.Request
-		err error
-	)
-
-	if body != nil {
-		req, err = http.NewRequestWithContext(ctx, http.MethodPost, URL, body)
-	} else {
-		req, err = http.NewRequestWithContext(ctx, http.MethodGet, URL, nil)
-	}
-
-	if err != nil {
-		return nil, "", err
-	}
-
-	if len(headers) > 0 {
-		for key, values := range headers {
-			for _, v := range values {
-				req.Header.Add(key, v)
-			}
-		}
-	}
-
-	if req.Header.Get("User-Agent") == "" {
-		req.Header.Set("User-Agent", defaultUserAgent)
-	}
-
-	// выполняем запрос
-	response, err := r.client.Do(req)
-
-	if err != nil {
-		return nil, "", err
-	}
-
-	defer func() {
-		closeErr := response.Body.Close()
-		if closeErr != nil {
-			r.logger.ErrorContext(ctx, closeErr.Error())
-		}
-	}()
-
-	if response.StatusCode < 200 || response.StatusCode > 299 {
-		return nil, "", fmt.Errorf("load %s: unsuccess status: %s", URL, response.Status)
-	}
-
-	_, err = buff.ReadFrom(response.Body)
-	if err != nil {
-		return nil, "", err
-	}
-
-	if response.Request != nil &&
-		response.Request.URL != nil &&
-		response.Request.URL.String() != URL {
-		URL = response.Request.URL.String()
-	}
-
-	return buff, URL, nil
 }
 
 // RequestString запрашивает данные по урле и возвращает их строкой
 func (r *Requester) RequestString(ctx context.Context, URL string) (string, error) {
+	if r.cache != nil {
+		v, ok := r.cache.GetString(ctx, URL)
+		if ok {
+			return v, nil
+		}
+	}
+
 	buff, _, err := r.requestBuffer(ctx, URL, nil, nil)
 	if err != nil {
 		return "", err
+	}
+
+	if r.cache != nil {
+		r.cache.SetString(ctx, URL, buff.String())
 	}
 
 	return buff.String(), nil
 }
 
 func (r *Requester) RequestStringWithRedirect(ctx context.Context, URL string) (string, string, error) {
+	if r.cache != nil {
+		v, ok := r.cache.GetString(ctx, URL)
+		if ok {
+			return v, URL, nil
+		}
+	}
+
 	buff, resultURL, err := r.requestBuffer(ctx, URL, nil, nil)
 	if err != nil {
 		return "", "", err
+	}
+
+	if r.cache != nil {
+		r.cache.SetString(ctx, resultURL, buff.String())
 	}
 
 	return buff.String(), resultURL, nil

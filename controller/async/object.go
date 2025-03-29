@@ -4,14 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+
+	"github.com/gbh007/hgraber-next-agent-core/entities"
 )
-
-type Runner interface {
-	Start(context.Context) (chan struct{}, error)
-	Name() string
-}
-
-type AfterStopHandler func()
 
 func New(logger *slog.Logger) *Controller {
 	return &Controller{
@@ -23,15 +18,15 @@ type Controller struct {
 	logger *slog.Logger
 
 	runnerChannels []chan struct{}
-	runners        []Runner
-	after          []AfterStopHandler
+	runners        []entities.Runner
+	after          []func()
 }
 
-func (c *Controller) RegisterRunner(ctx context.Context, runner Runner) {
+func (c *Controller) RegisterRunner(ctx context.Context, runner entities.Runner) {
 	c.runners = append(c.runners, runner)
 }
 
-func (c *Controller) RegisterAfterStop(ctx context.Context, handler AfterStopHandler) {
+func (c *Controller) RegisterAfterStop(ctx context.Context, handler func()) {
 	c.after = append(c.after, handler)
 }
 

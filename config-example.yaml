@@ -24,6 +24,11 @@ parsers:
   enabled:
     - mock
     - hgraber_local
+  cache:
+    enabled: false
+    path: .hidden/cache
+    ttl: 1h
+    clean_interval: 5m
 fs_base:
   import_path: .hidden/imported
   file_path: .hidden/filedata

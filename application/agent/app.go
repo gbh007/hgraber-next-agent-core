@@ -25,7 +25,17 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
-type ParserInit[T any] func(ctx context.Context, logger *slog.Logger, cfg config.Config[T]) ([]hgraber.Parser, error)
+type Async interface {
+	RegisterRunner(ctx context.Context, runner entities.Runner)
+	RegisterAfterStop(ctx context.Context, handler func())
+}
+
+type ParserInit[T any] func(
+	ctx context.Context,
+	logger *slog.Logger,
+	cfg config.Config[T],
+	async Async,
+) ([]hgraber.Parser, error)
 
 func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 	cfg, needScan, err := parseConfig[T]()
@@ -82,7 +92,7 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
 		mAPI             *masterapi.Client
 	)
 
-	parsers, err := parserInit(ctx, logger, cfg)
+	parsers, err := parserInit(ctx, logger, cfg, async)
 	if err != nil {
 		logger.ErrorContext(
 			ctx, "fail init parsers",
