@@ -10,14 +10,12 @@ import (
 )
 
 func (uc *UseCase) HProxyBook(ctx context.Context, u url.URL) (entities.HProxyBookDetails, error) {
-	stringURL := u.String()
-
-	parser, err := uc.loader.Load(ctx, stringURL)
+	parser, err := uc.loader.Load(ctx, u)
 	if err != nil {
 		return entities.HProxyBookDetails{}, fmt.Errorf("load parser: %w", err)
 	}
 
-	details, err := parser.HProxyBookDetails(ctx, u)
+	details, err := parser.HProxyBookDetails(ctx)
 	if err != nil {
 		return entities.HProxyBookDetails{}, fmt.Errorf("parse: %w", err)
 	}

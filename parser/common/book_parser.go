@@ -2,7 +2,6 @@ package common
 
 import (
 	"context"
-	"net/url"
 
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
 	"github.com/gbh007/hgraber-next-agent-core/entities"
@@ -15,14 +14,10 @@ var (
 
 type BookParser struct{}
 
-func (BookParser) BookDetails(ctx context.Context, u url.URL) (entities.AgentBookDetails, error) {
-	return entities.AgentBookDetails{
-		URL: u,
-	}, nil
+func (BookParser) BookDetails(ctx context.Context) (entities.AgentBookDetails, error) {
+	return entities.AgentBookDetails{}, nil
 }
 
-func (BookParser) HProxyBookDetails(ctx context.Context, u url.URL) (entities.HProxyBookDetails, error) {
-	return entities.HProxyBookDetails{
-		URL: u,
-	}, nil
+func (BookParser) HProxyBookDetails(ctx context.Context) (entities.HProxyBookDetails, error) {
+	return entities.HProxyBookDetails{}, nil
 }

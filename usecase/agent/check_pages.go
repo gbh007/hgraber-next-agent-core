@@ -10,7 +10,7 @@ func (uc *UseCase) CheckPages(ctx context.Context, pages []entities.AgentPageURL
 	result := make([]entities.AgentPageCheckResult, len(pages))
 
 	for i, p := range pages {
-		hasParser, err := uc.loader.HasParser(ctx, p.BookURL.String())
+		hasParser, err := uc.loader.HasParser(ctx, p.BookURL)
 
 		switch {
 		case err != nil:

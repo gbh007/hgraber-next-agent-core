@@ -9,14 +9,12 @@ import (
 )
 
 func (uc *UseCase) ParseBook(ctx context.Context, u url.URL) (entities.AgentBookDetails, error) {
-	stringURL := u.String()
-
-	parser, err := uc.loader.Load(ctx, stringURL)
+	parser, err := uc.loader.Load(ctx, u)
 	if err != nil {
 		return entities.AgentBookDetails{}, fmt.Errorf("load parser: %w", err)
 	}
 
-	details, err := parser.BookDetails(ctx, u)
+	details, err := parser.BookDetails(ctx)
 	if err != nil {
 		return entities.AgentBookDetails{}, fmt.Errorf("parse: %w", err)
 	}

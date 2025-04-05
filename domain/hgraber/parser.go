@@ -17,15 +17,15 @@ var (
 // Parser интерфейс для реализации парсеров для различных сайтов
 type Parser interface {
 	Name() string
-	Load(ctx context.Context, u string) (BookParser, error)
-	CanParse(u string) bool
-	AllBooks(ctx context.Context, u string) ([]string, error)
-	LoadImage(ctx context.Context, u string, bookUrl string) (io.ReadCloser, error)
+	Load(ctx context.Context, u url.URL) (BookParser, error)
+	CanParse(u url.URL) bool
+	AllBooks(ctx context.Context, u url.URL) ([]string, error)
+	LoadImage(ctx context.Context, u url.URL, bookUrl url.URL) (io.ReadCloser, error)
 
 	HProxyList(ctx context.Context, u url.URL) ([]entities.HProxyListUnit, error)
 }
 
 type BookParser interface {
-	BookDetails(ctx context.Context, u url.URL) (entities.AgentBookDetails, error)
-	HProxyBookDetails(ctx context.Context, u url.URL) (entities.HProxyBookDetails, error)
+	BookDetails(ctx context.Context) (entities.AgentBookDetails, error)
+	HProxyBookDetails(ctx context.Context) (entities.HProxyBookDetails, error)
 }

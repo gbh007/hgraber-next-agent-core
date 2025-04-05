@@ -53,17 +53,19 @@ func ParseBookAttr(ctx context.Context, p legacyParser, attr hgraber.Attribute) 
 type LegacyParserAdapter struct {
 	BookParser
 	old legacyParser
+	u   url.URL
 }
 
-func NewLegacyParserAdapter(old legacyParser) LegacyParserAdapter {
+func NewLegacyParserAdapter(old legacyParser, u url.URL) LegacyParserAdapter {
 	return LegacyParserAdapter{
 		old: old,
+		u:   u,
 	}
 }
 
-func (adapter LegacyParserAdapter) BookDetails(ctx context.Context, u url.URL) (entities.AgentBookDetails, error) {
+func (adapter LegacyParserAdapter) BookDetails(ctx context.Context) (entities.AgentBookDetails, error) {
 	details := entities.AgentBookDetails{
-		URL: u,
+		URL: adapter.u,
 	}
 
 	var err error

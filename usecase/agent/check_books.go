@@ -11,9 +11,7 @@ func (uc *UseCase) CheckBooks(ctx context.Context, urls []url.URL) ([]entities.A
 	result := make([]entities.AgentBookCheckResult, 0, len(urls))
 
 	for _, u := range urls {
-		stringURL := u.String()
-
-		hasParser, err := uc.loader.HasParser(ctx, stringURL)
+		hasParser, err := uc.loader.HasParser(ctx, u)
 		if err != nil {
 			result = append(result, entities.AgentBookCheckResult{
 				URL:         u,
