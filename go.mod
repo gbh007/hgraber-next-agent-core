@@ -77,4 +77,4 @@ require (
 )
 
 // Для отладки
-// replace github.com/gbh007/hgraber-next => ../hgraber-next
+replace github.com/gbh007/hgraber-next => ../hgraber-next

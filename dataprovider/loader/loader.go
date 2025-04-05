@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net/url"
 	"time"
 
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
+	"github.com/gbh007/hgraber-next-agent-core/entities"
 	"github.com/gbh007/hgraber-next-agent-core/metrics"
 	"github.com/gbh007/hgraber-next-agent-core/parser/hgraber_local"
 	"github.com/gbh007/hgraber-next-agent-core/parser/mock"
@@ -146,6 +148,26 @@ func (l *Loader) AllBooks(ctx context.Context, u string) ([]string, error) {
 	data, err := p.AllBooks(ctx, u)
 	if err != nil {
 		return nil, fmt.Errorf("load books: %w", err)
+	}
+
+	return data, nil
+}
+
+func (l *Loader) HProxyList(ctx context.Context, u url.URL) ([]entities.HProxyListUnit, error) {
+	startAt := time.Now()
+
+	p, err := l.getParser(u.String())
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		metrics.RegisterParserActionTime("loader_hproxy_list", p.Name(), time.Since(startAt))
+	}()
+
+	data, err := p.HProxyList(ctx, u)
+	if err != nil {
+		return nil, fmt.Errorf("load hproxy list: %w", err)
 	}
 
 	return data, nil

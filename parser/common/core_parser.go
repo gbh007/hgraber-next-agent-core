@@ -6,10 +6,12 @@ import (
 	"html"
 	"io"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
+	"github.com/gbh007/hgraber-next-agent-core/entities"
 )
 
 // Проверка соответствия базового типа
@@ -67,6 +69,10 @@ func (cp CoreParser) LoadImage(ctx context.Context, u string, bookUrl string) (i
 	}
 
 	return data, nil
+}
+
+func (cp CoreParser) HProxyList(ctx context.Context, u url.URL) ([]entities.HProxyListUnit, error) {
+	return nil, nil
 }
 
 func TrimLastSlash(URL string, count int) string {

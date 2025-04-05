@@ -4,8 +4,10 @@ import (
 	"context"
 	"io"
 	"log/slog"
+	"net/url"
 
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
+	"github.com/gbh007/hgraber-next-agent-core/entities"
 )
 
 type loader interface {
@@ -13,6 +15,7 @@ type loader interface {
 	Load(ctx context.Context, URL string) (hgraber.BookParser, error)
 	LoadImage(ctx context.Context, u string, bookUrl string) (io.ReadCloser, error)
 	AllBooks(ctx context.Context, u string) ([]string, error)
+	HProxyList(ctx context.Context, u url.URL) ([]entities.HProxyListUnit, error)
 }
 
 type UseCase struct {

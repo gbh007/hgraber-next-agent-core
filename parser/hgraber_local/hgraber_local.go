@@ -20,8 +20,7 @@ import (
 
 // Проверка соответствия базового типа
 var (
-	_ hgraber.BookParser = (*BookParser)(nil)
-	_ hgraber.Parser     = (*Parser)(nil)
+	_ hgraber.Parser = (*Parser)(nil)
 
 	ParserError = errors.New("parser hgraber_v4")
 )
@@ -74,7 +73,7 @@ func (p *Parser) Load(ctx context.Context, u string) (hgraber.BookParser, error)
 		return nil, fmt.Errorf("%w: unmarshal: %w", ParserError, err)
 	}
 
-	return bookParser, nil
+	return common.NewLegacyParserAdapter(bookParser), nil
 }
 
 func (p *Parser) headers() http.Header {

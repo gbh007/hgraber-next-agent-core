@@ -21,6 +21,9 @@ type ParsingUseCases interface {
 	DownloadPage(ctx context.Context, bookURL, imageURL url.URL) (io.Reader, error)
 	CheckPages(ctx context.Context, pages []entities.AgentPageURL) ([]entities.AgentPageCheckResult, error)
 	MultiHandle(ctx context.Context, multiUrl url.URL) ([]entities.AgentBookCheckResult, error)
+
+	HProxyBook(ctx context.Context, u url.URL) (entities.HProxyBookDetails, error)
+	HProxyList(ctx context.Context, u url.URL) ([]entities.HProxyListUnit, error)
 }
 
 type ImportUseCases interface {

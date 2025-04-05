@@ -16,11 +16,7 @@ func (uc *UseCase) ParseBook(ctx context.Context, u url.URL) (entities.AgentBook
 		return entities.AgentBookDetails{}, fmt.Errorf("load parser: %w", err)
 	}
 
-	details, err := parserAdapter{
-		ctx:        ctx,
-		u:          u,
-		BookParser: parser,
-	}.BookDetails()
+	details, err := parser.BookDetails(ctx, u)
 	if err != nil {
 		return entities.AgentBookDetails{}, fmt.Errorf("parse: %w", err)
 	}

@@ -13,8 +13,7 @@ import (
 
 // Проверка соответствия базового типа
 var (
-	_ hgraber.BookParser = (*BookParser)(nil)
-	_ hgraber.Parser     = (*Parser)(nil)
+	_ hgraber.Parser = (*Parser)(nil)
 
 	ParserError = errors.New("parser mock")
 )
@@ -47,7 +46,7 @@ func (p *Parser) Load(ctx context.Context, URL string) (hgraber.BookParser, erro
 
 	bookParser.body = body
 
-	return bookParser, nil
+	return common.NewLegacyParserAdapter(bookParser), nil
 }
 
 type BookParser struct {
