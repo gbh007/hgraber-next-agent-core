@@ -100,7 +100,7 @@ func New(
 	}
 
 	if c.parsingUseCases != nil {
-		c.enabledModules = append(c.enabledModules, "parsing")
+		c.enabledModules = append(c.enabledModules, "parsing", "hproxy")
 	}
 
 	if c.importUseCase != nil {
