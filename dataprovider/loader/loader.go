@@ -17,11 +17,6 @@ import (
 	"github.com/gbh007/hgraber-next-agent-core/request"
 )
 
-type Cache interface {
-	SetString(ctx context.Context, u, v string)
-	GetString(ctx context.Context, u string) (string, bool)
-}
-
 type Loader struct {
 	parsers []hgraber.Parser
 }
@@ -31,7 +26,7 @@ func NewDefaultParsers(
 	hgToken string,
 	timeout time.Duration,
 	enabledParsers []string,
-	cache Cache,
+	cache request.Cache,
 ) []hgraber.Parser {
 	requester := request.New(logger, timeout, nil, cache)
 
