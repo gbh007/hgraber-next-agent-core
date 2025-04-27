@@ -6,10 +6,12 @@ import (
 	"html"
 	"io"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
+	"github.com/gbh007/hgraber-next-agent-core/entities"
 )
 
 // Проверка соответствия базового типа
@@ -42,13 +44,13 @@ func (cp CoreParser) Name() string {
 	return cp.name
 }
 
-func (cp CoreParser) Load(ctx context.Context, u string) (hgraber.BookParser, error) {
+func (cp CoreParser) Load(ctx context.Context, u url.URL) (hgraber.BookParser, error) {
 	return nil, fmt.Errorf("unimplemented in core parser")
 }
 
-func (cp CoreParser) CanParse(u string) bool {
+func (cp CoreParser) CanParse(u url.URL) bool {
 	for _, prefix := range cp.prefixes {
-		if strings.HasPrefix(u, prefix) {
+		if strings.HasPrefix(u.String(), prefix) {
 			return true
 		}
 	}
@@ -56,17 +58,21 @@ func (cp CoreParser) CanParse(u string) bool {
 	return false
 }
 
-func (cp CoreParser) AllBooks(ctx context.Context, u string) ([]string, error) {
+func (cp CoreParser) AllBooks(ctx context.Context, u url.URL) ([]string, error) {
 	return nil, nil
 }
 
-func (cp CoreParser) LoadImage(ctx context.Context, u string, bookUrl string) (io.ReadCloser, error) {
-	data, err := cp.Requester.Request(ctx, u, nil)
+func (cp CoreParser) LoadImage(ctx context.Context, u url.URL, bookUrl url.URL) (io.ReadCloser, error) {
+	data, err := cp.Requester.Request(ctx, u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
 
 	return data, nil
+}
+
+func (cp CoreParser) HProxyList(ctx context.Context, u url.URL) ([]entities.HProxyListUnit, error) {
+	return nil, nil
 }
 
 func TrimLastSlash(URL string, count int) string {

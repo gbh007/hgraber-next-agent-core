@@ -13,7 +13,7 @@ import (
 func (uc *UseCase) MultiHandle(ctx context.Context, multiUrl url.URL) ([]entities.AgentBookCheckResult, error) {
 	result := make([]entities.AgentBookCheckResult, 0, 100)
 
-	urls, err := uc.loader.AllBooks(ctx, multiUrl.String())
+	urls, err := uc.loader.AllBooks(ctx, multiUrl)
 	// FIXME: подумать как лучше это сделать
 	if errors.Is(err, hgraber.InvalidLinkError) {
 		return []entities.AgentBookCheckResult{}, nil

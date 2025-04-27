@@ -3,7 +3,7 @@ module github.com/gbh007/hgraber-next-agent-core
 go 1.23.3
 
 require (
-	github.com/gbh007/hgraber-next v1.0.0
+	github.com/gbh007/hgraber-next v1.2.0
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/google/uuid v1.6.0
 	github.com/grafana/pyroscope-go v1.2.0

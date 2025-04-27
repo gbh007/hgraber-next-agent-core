@@ -1,6 +1,7 @@
 package request
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"log/slog"
@@ -12,14 +13,16 @@ import (
 
 const defaultUserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
 
-type cache interface {
+type Cache interface {
 	SetString(ctx context.Context, u, v string)
 	GetString(ctx context.Context, u string) (string, bool)
+	SetBytes(ctx context.Context, u string, v []byte)
+	GetBytes(ctx context.Context, u string) ([]byte, bool)
 }
 
 type Requester struct {
 	logger *slog.Logger
-	cache  cache
+	cache  Cache
 	client *http.Client
 }
 
@@ -27,7 +30,7 @@ func New(
 	logger *slog.Logger,
 	timeout time.Duration,
 	transport http.RoundTripper,
-	cache cache,
+	cache Cache,
 ) *Requester {
 	if transport == nil {
 		transport = http.DefaultTransport
@@ -98,16 +101,28 @@ func (r *Requester) RequestBytes(ctx context.Context, URL string) ([]byte, error
 }
 
 func (r *Requester) Request(ctx context.Context, URL string, headers http.Header) (io.ReadCloser, error) {
+	if r.cache != nil {
+		v, ok := r.cache.GetBytes(ctx, URL)
+		if ok {
+			return io.NopCloser(bytes.NewReader(v)), nil
+		}
+	}
+
 	// FIXME: работать с потоком напрямую
 	buff, _, err := r.requestBuffer(ctx, URL, headers, nil)
 	if err != nil {
 		return nil, err
 	}
 
+	if r.cache != nil {
+		r.cache.SetBytes(ctx, URL, buff.Bytes())
+	}
+
 	return io.NopCloser(buff), nil
 }
 
 func (r *Requester) RequestPost(ctx context.Context, u string, headers http.Header, body io.Reader) ([]byte, error) {
+
 	buff, _, err := r.requestBuffer(ctx, u, headers, body)
 	if err != nil {
 		return nil, err

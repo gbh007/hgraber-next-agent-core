@@ -20,8 +20,7 @@ import (
 
 // Проверка соответствия базового типа
 var (
-	_ hgraber.BookParser = (*BookParser)(nil)
-	_ hgraber.Parser     = (*Parser)(nil)
+	_ hgraber.Parser = (*Parser)(nil)
 
 	ParserError = errors.New("parser hgraber_v4")
 )
@@ -41,21 +40,16 @@ func New(r common.Requester, token string) *Parser {
 	}
 }
 
-func (p *Parser) Load(ctx context.Context, u string) (hgraber.BookParser, error) {
+func (p *Parser) Load(ctx context.Context, u url.URL) (hgraber.BookParser, error) {
 	bookParser := BookParser{}
 
-	originUrl, err := url.Parse(u)
-	if err != nil {
-		return nil, fmt.Errorf("%w: parse url: %w", ParserError, err)
-	}
-
-	id, err := strconv.Atoi(strings.TrimPrefix(originUrl.Path, "/"))
+	id, err := strconv.Atoi(strings.TrimPrefix(u.Path, "/"))
 	if err != nil {
 		return nil, fmt.Errorf("%w: parse book id: %w", ParserError, err)
 	}
 
-	originUrl.Scheme = "http"
-	originUrl.Path = "/api/book"
+	u.Scheme = "http"
+	u.Path = "/api/book"
 
 	requestBody, err := json.Marshal(map[string]any{
 		"id": id,
@@ -64,7 +58,7 @@ func (p *Parser) Load(ctx context.Context, u string) (hgraber.BookParser, error)
 		return nil, fmt.Errorf("%w: marshal request body: %w", ParserError, err)
 	}
 
-	raw, err := p.Requester.RequestPost(ctx, originUrl.String(), p.headers(), bytes.NewReader(requestBody))
+	raw, err := p.Requester.RequestPost(ctx, u.String(), p.headers(), bytes.NewReader(requestBody))
 	if err != nil {
 		return nil, fmt.Errorf("%w: request: %w", ParserError, err)
 	}
@@ -74,7 +68,7 @@ func (p *Parser) Load(ctx context.Context, u string) (hgraber.BookParser, error)
 		return nil, fmt.Errorf("%w: unmarshal: %w", ParserError, err)
 	}
 
-	return bookParser, nil
+	return common.NewLegacyParserAdapter(bookParser, u), nil
 }
 
 func (p *Parser) headers() http.Header {
@@ -85,8 +79,8 @@ func (p *Parser) headers() http.Header {
 	return headers
 }
 
-func (p *Parser) LoadImage(ctx context.Context, u string, bookUrl string) (io.ReadCloser, error) {
-	data, err := p.Requester.Request(ctx, u, p.headers())
+func (p *Parser) LoadImage(ctx context.Context, u url.URL, bookUrl url.URL) (io.ReadCloser, error) {
+	data, err := p.Requester.Request(ctx, u.String(), p.headers())
 	if err != nil {
 		return nil, err
 	}

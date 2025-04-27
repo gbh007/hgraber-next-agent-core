@@ -12,6 +12,7 @@ import (
 	"github.com/gbh007/hgraber-next-agent-core/dataprovider/loader"
 	"github.com/gbh007/hgraber-next-agent-core/dataprovider/webcache"
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
+	"github.com/gbh007/hgraber-next-agent-core/request"
 )
 
 func main() {
@@ -36,7 +37,7 @@ func main() {
 			return []hgraber.Parser{}, nil
 		}
 
-		var cache loader.Cache
+		var cache request.Cache
 
 		if cfg.Parsers.Cache.Enabled {
 			wc, err := webcache.New(cfg.Parsers.Cache.Path, logger, cfg.Parsers.Cache.TTL, cfg.Parsers.Cache.CleanInterval)

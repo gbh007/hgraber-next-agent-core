@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"regexp"
 	"strings"
 
@@ -13,8 +14,7 @@ import (
 
 // Проверка соответствия базового типа
 var (
-	_ hgraber.BookParser = (*BookParser)(nil)
-	_ hgraber.Parser     = (*Parser)(nil)
+	_ hgraber.Parser = (*Parser)(nil)
 
 	ParserError = errors.New("parser mock")
 )
@@ -31,23 +31,23 @@ func New(r common.Requester) *Parser {
 	}
 }
 
-func (p *Parser) Load(ctx context.Context, URL string) (hgraber.BookParser, error) {
+func (p *Parser) Load(ctx context.Context, u url.URL) (hgraber.BookParser, error) {
 	bookParser := BookParser{
-		url: URL,
+		url: u.String(),
 	}
 
 	if len(bookParser.url) > 1 && bookParser.url[len(bookParser.url)-1] == '/' {
 		bookParser.url = bookParser.url[:len(bookParser.url)-1]
 	}
 
-	body, err := p.Requester.RequestString(ctx, URL)
+	body, err := p.Requester.RequestString(ctx, u.String())
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", ParserError, err)
 	}
 
 	bookParser.body = body
 
-	return bookParser, nil
+	return common.NewLegacyParserAdapter(bookParser, u), nil
 }
 
 type BookParser struct {
