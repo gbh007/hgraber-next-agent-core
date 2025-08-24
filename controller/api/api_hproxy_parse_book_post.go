@@ -16,7 +16,13 @@ func (c *Controller) APIHproxyParseBookPost(ctx context.Context, req *agentapi.A
 		}, nil
 	}
 
-	details, err := c.parsingUseCases.HProxyBook(ctx, req.URL)
+	var pageLimit *int
+
+	if req.PageLimit.Set {
+		pageLimit = &req.PageLimit.Value
+	}
+
+	details, err := c.parsingUseCases.HProxyBook(ctx, req.URL, pageLimit)
 	if err != nil {
 		return &agentapi.APIHproxyParseBookPostInternalServerError{
 			InnerCode: ParseUseCaseCode,

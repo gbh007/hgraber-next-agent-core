@@ -18,6 +18,6 @@ func (BookParser) BookDetails(ctx context.Context) (entities.AgentBookDetails, e
 	return entities.AgentBookDetails{}, nil
 }
 
-func (BookParser) HProxyBookDetails(ctx context.Context) (entities.HProxyBookDetails, error) {
+func (BookParser) HProxyBookDetails(ctx context.Context, pageLimit *int) (entities.HProxyBookDetails, error) {
 	return entities.HProxyBookDetails{}, nil
 }

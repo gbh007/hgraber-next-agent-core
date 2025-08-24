@@ -38,6 +38,11 @@ const (
 	DetailsHProxyListUnitType
 )
 
+type HProxyList struct {
+	Units   []HProxyListUnit
+	NextURL *url.URL
+}
+
 type HProxyListUnit struct {
 	LinkURL    url.URL
 	PreviewURL *url.URL

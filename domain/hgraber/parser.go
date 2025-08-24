@@ -22,10 +22,10 @@ type Parser interface {
 	AllBooks(ctx context.Context, u url.URL) ([]string, error)
 	LoadImage(ctx context.Context, u url.URL, bookUrl url.URL) (io.ReadCloser, error)
 
-	HProxyList(ctx context.Context, u url.URL) ([]entities.HProxyListUnit, error)
+	HProxyList(ctx context.Context, u url.URL) (entities.HProxyList, error)
 }
 
 type BookParser interface {
 	BookDetails(ctx context.Context) (entities.AgentBookDetails, error)
-	HProxyBookDetails(ctx context.Context) (entities.HProxyBookDetails, error)
+	HProxyBookDetails(ctx context.Context, pageLimit *int) (entities.HProxyBookDetails, error)
 }

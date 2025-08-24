@@ -71,8 +71,8 @@ func (cp CoreParser) LoadImage(ctx context.Context, u url.URL, bookUrl url.URL) 
 	return data, nil
 }
 
-func (cp CoreParser) HProxyList(ctx context.Context, u url.URL) ([]entities.HProxyListUnit, error) {
-	return nil, nil
+func (cp CoreParser) HProxyList(ctx context.Context, u url.URL) (entities.HProxyList, error) {
+	return entities.HProxyList{}, nil
 }
 
 func TrimLastSlash(URL string, count int) string {

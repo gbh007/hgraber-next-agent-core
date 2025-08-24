@@ -24,8 +24,14 @@ func (c *Controller) APIHproxyParseListPost(ctx context.Context, req *agentapi.A
 		}, nil
 	}
 
+	var nextPage agentapi.OptURI
+
+	if list.NextURL != nil {
+		nextPage = agentapi.NewOptURI(*list.NextURL)
+	}
+
 	return &agentapi.APIHproxyParseListPostOK{
-		Results: pkg.Map(list, func(u entities.HProxyListUnit) agentapi.APIHproxyParseListPostOKResultsItem {
+		Results: pkg.Map(list.Units, func(u entities.HProxyListUnit) agentapi.APIHproxyParseListPostOKResultsItem {
 			var t agentapi.APIHproxyParseListPostOKResultsItemType
 
 			switch u.Type {
@@ -42,5 +48,6 @@ func (c *Controller) APIHproxyParseListPost(ctx context.Context, req *agentapi.A
 				Type:       t,
 			}
 		}),
+		NextURL: nextPage,
 	}, nil
 }

@@ -15,7 +15,7 @@ type loader interface {
 	Load(ctx context.Context, u url.URL) (hgraber.BookParser, error)
 	LoadImage(ctx context.Context, u url.URL, bookUrl url.URL) (io.ReadCloser, error)
 	AllBooks(ctx context.Context, u url.URL) ([]string, error)
-	HProxyList(ctx context.Context, u url.URL) ([]entities.HProxyListUnit, error)
+	HProxyList(ctx context.Context, u url.URL) (entities.HProxyList, error)
 }
 
 type UseCase struct {

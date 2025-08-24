@@ -148,12 +148,12 @@ func (l *Loader) AllBooks(ctx context.Context, u url.URL) ([]string, error) {
 	return data, nil
 }
 
-func (l *Loader) HProxyList(ctx context.Context, u url.URL) ([]entities.HProxyListUnit, error) {
+func (l *Loader) HProxyList(ctx context.Context, u url.URL) (entities.HProxyList, error) {
 	startAt := time.Now()
 
 	p, err := l.getParser(u)
 	if err != nil {
-		return nil, err
+		return entities.HProxyList{}, err
 	}
 
 	defer func() {
@@ -162,7 +162,7 @@ func (l *Loader) HProxyList(ctx context.Context, u url.URL) ([]entities.HProxyLi
 
 	data, err := p.HProxyList(ctx, u)
 	if err != nil {
-		return nil, fmt.Errorf("load hproxy list: %w", err)
+		return entities.HProxyList{}, fmt.Errorf("load hproxy list: %w", err)
 	}
 
 	return data, nil
