@@ -3,9 +3,9 @@ package config
 import "time"
 
 type DebugServer struct {
-	Addr            string `yaml:"addr" envconfig:"ADDR"`
-	LogErrorHandler bool   `yaml:"log_error_handler" envconfig:"LOG_ERROR_HANDLER"`
-	Debug           bool   `yaml:"debug" envconfig:"DEBUG"`
+	Addr            string `toml:"addr" yaml:"addr" envconfig:"ADDR"`
+	LogErrorHandler bool   `toml:"log_error_handler" yaml:"log_error_handler" envconfig:"LOG_ERROR_HANDLER"`
+	Debug           bool   `toml:"debug" yaml:"debug" envconfig:"DEBUG"`
 }
 
 func DefaultDebugServer() DebugServer {
@@ -13,9 +13,9 @@ func DefaultDebugServer() DebugServer {
 }
 
 type Parsers struct {
-	HG4Token string       `yaml:"hg4_token" envconfig:"HG4_TOKEN"`
-	Enabled  []string     `yaml:"enabled" envconfig:"ENABLED"`
-	Cache    ParsersCache `yaml:"cache" envconfig:"CACHE"`
+	HG4Token string       `toml:"hg4_token" yaml:"hg4_token" envconfig:"HG4_TOKEN"`
+	Enabled  []string     `toml:"enabled" yaml:"enabled" envconfig:"ENABLED"`
+	Cache    ParsersCache `toml:"cache" yaml:"cache" envconfig:"CACHE"`
 }
 
 func DefaultParsers() *Parsers {
@@ -30,10 +30,10 @@ func DefaultParsers() *Parsers {
 }
 
 type ParsersCache struct {
-	Enabled       bool          `yaml:"enabled" envconfig:"ENABLED"`
-	Path          string        `yaml:"path" envconfig:"PATH"`
-	TTL           time.Duration `yaml:"ttl" envconfig:"TTL"`
-	CleanInterval time.Duration `yaml:"clean_interval" envconfig:"CLEAN_INTERVAL"`
+	Enabled       bool          `toml:"enabled" yaml:"enabled" envconfig:"ENABLED"`
+	Path          string        `toml:"path" yaml:"path" envconfig:"PATH"`
+	TTL           time.Duration `toml:"ttl" yaml:"ttl" envconfig:"TTL"`
+	CleanInterval time.Duration `toml:"clean_interval" yaml:"clean_interval" envconfig:"CLEAN_INTERVAL"`
 }
 
 func DefaultParsersCache() ParsersCache {

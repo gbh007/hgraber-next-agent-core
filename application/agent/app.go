@@ -37,8 +37,8 @@ type ParserInit[T any] func(
 	async Async,
 ) ([]hgraber.Parser, error)
 
-func Serve[T any](ctx context.Context, parserInit ParserInit[T]) {
-	cfg, needScan, err := parseConfig[T]()
+func Serve[T any](ctx context.Context, parserInit ParserInit[T], defaultParsers func() *T) {
+	cfg, needScan, err := parseConfig[T](defaultParsers)
 	if err != nil {
 		// Поскольку на этот момент нет ни логгера ни вообще ничего то выкидываем панику.
 		panic(err)

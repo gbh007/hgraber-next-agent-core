@@ -7,29 +7,18 @@ import (
 	"os"
 
 	"github.com/gbh007/hgraber-next-agent-core/config"
+	hgconfig "github.com/gbh007/hgraber-next/config"
 
 	"go.opentelemetry.io/otel/trace"
 )
 
-func parseConfig[T any]() (config.Config[T], bool, error) {
+func parseConfig[T any](defaultParsers func() *T) (config.Config[T], bool, error) {
 	configPath := flag.String("config", "config.yaml", "path to config")
-	generateConfig := flag.String("generate-config", "", "generate example config")
 	scan := flag.Bool("scan", false, "scan zip file to register in db")
 	useEnv := flag.Bool("use-env", false, "use env config")
 	flag.Parse()
 
-	defaultParsers := func() *T { return nil } // TODO: вынести установку этой функции в обвязку
-
-	if *generateConfig != "" {
-		err := config.ExportToFile(config.DefaultConfig(defaultParsers), *generateConfig)
-		if err != nil {
-			panic(err)
-		}
-
-		os.Exit(0)
-	}
-
-	c, err := config.ImportConfig(*configPath, defaultParsers, *useEnv)
+	c, err := hgconfig.ImportConfig(*configPath, *useEnv, config.DefaultConfigWrapped(defaultParsers))
 
 	return c, *scan, err
 }
