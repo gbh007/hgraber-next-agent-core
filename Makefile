@@ -3,8 +3,8 @@ COMMIT = $(shell git rev-parse --short HEAD)
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 BUILD_TIME = $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-CORE_MOD_NAME = github.com/gbh007/hgraber-next-agent-core
-LDFLAGS = -ldflags "-X '$(CORE_MOD_NAME)/version.Version=$(TAG)' -X '$(CORE_MOD_NAME)/version.Commit=$(COMMIT)' -X '$(CORE_MOD_NAME)/version.BuildAt=$(BUILD_TIME)' -X '$(CORE_MOD_NAME)/version.Branch=$(BRANCH)'"
+VERSION_MOD_NAME = github.com/gbh007/hgraber-next
+LDFLAGS = -ldflags "-X '$(VERSION_MOD_NAME)/version.Version=$(TAG)' -X '$(VERSION_MOD_NAME)/version.Commit=$(COMMIT)' -X '$(VERSION_MOD_NAME)/version.BuildAt=$(BUILD_TIME)' -X '$(VERSION_MOD_NAME)/version.Branch=$(BRANCH)'"
 
 SERVICE_BIN = $(PWD)/_build
 

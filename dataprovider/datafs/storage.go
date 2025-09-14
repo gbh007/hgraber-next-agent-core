@@ -6,25 +6,33 @@ import (
 	"log/slog"
 	"os"
 	"path"
+	"time"
 
 	"github.com/google/uuid"
 )
 
-type Storage struct {
-	fsPath string
-
-	logger *slog.Logger
+type metricProvider interface {
+	RegisterFSActionTime(action string, fsID *uuid.UUID, d time.Duration)
 }
 
-func New(path string, logger *slog.Logger) (*Storage, error) {
+type Storage struct {
+	logger         *slog.Logger
+	metricProvider metricProvider
+
+	fsPath string
+}
+
+func New(logger *slog.Logger, metricProvider metricProvider, path string) (*Storage, error) {
 	err := createDir(path)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Storage{
+		logger:         logger,
+		metricProvider: metricProvider,
+
 		fsPath: path,
-		logger: logger,
 	}, nil
 }
 

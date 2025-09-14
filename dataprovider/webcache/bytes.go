@@ -9,8 +9,6 @@ import (
 	"os"
 	"path"
 	"time"
-
-	"github.com/gbh007/hgraber-next-agent-core/metrics"
 )
 
 func (c *Cache) SetBytes(ctx context.Context, u string, v []byte) {
@@ -22,7 +20,7 @@ func (c *Cache) SetBytes(ctx context.Context, u string, v []byte) {
 		)
 	}
 
-	metrics.IncWebCacheCounter("set")
+	c.metricProvider.IncWebCacheCounter("set")
 }
 
 func (c *Cache) GetBytes(ctx context.Context, u string) ([]byte, bool) {
@@ -35,9 +33,9 @@ func (c *Cache) GetBytes(ctx context.Context, u string) ([]byte, bool) {
 	}
 
 	if ok {
-		metrics.IncWebCacheCounter("hit")
+		c.metricProvider.IncWebCacheCounter("hit")
 	} else {
-		metrics.IncWebCacheCounter("miss")
+		c.metricProvider.IncWebCacheCounter("miss")
 	}
 
 	return v, ok

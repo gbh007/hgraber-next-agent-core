@@ -6,22 +6,31 @@ import (
 	"log/slog"
 	"os"
 	"sync"
+	"time"
+
+	"github.com/google/uuid"
 )
 
+type metricProvider interface {
+	RegisterFSActionTime(action string, fsID *uuid.UUID, d time.Duration)
+}
+
 type Storage struct {
+	logger         *slog.Logger
+	metricProvider metricProvider
+
 	fsPath string
 
 	limitOnFolder int
 	fsLimitMutex  sync.Mutex
 
-	logger *slog.Logger
-
 	useUnsafeCloser bool
 }
 
 func New(
-	path string,
 	logger *slog.Logger,
+	metricProvider metricProvider,
+	path string,
 	limitOnFolder int,
 	useUnsafeCloser bool,
 ) (*Storage, error) {
@@ -31,8 +40,10 @@ func New(
 	}
 
 	return &Storage{
+		logger:         logger,
+		metricProvider: metricProvider,
+
 		fsPath:          path,
-		logger:          logger,
 		limitOnFolder:   limitOnFolder,
 		useUnsafeCloser: useUnsafeCloser,
 	}, nil

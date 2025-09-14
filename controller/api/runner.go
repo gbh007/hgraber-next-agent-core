@@ -21,7 +21,7 @@ func (c *Controller) Start(parentCtx context.Context) (chan struct{}, error) {
 
 	mux := http.NewServeMux()
 
-	mux.Handle("/metrics", promhttp.Handler())
+	mux.Handle("/metrics", promhttp.HandlerFor(c.metricProvider.Registry(), promhttp.HandlerOpts{}))
 	mux.Handle("/api/", otelPropagation(c.logIO(cors(c.ogenServer))))
 
 	server := &http.Server{

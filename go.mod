@@ -3,7 +3,7 @@ module github.com/gbh007/hgraber-next-agent-core
 go 1.24.5
 
 require (
-	github.com/gbh007/hgraber-next v1.3.1-0.20250905041718-a066da796657
+	github.com/gbh007/hgraber-next v1.3.1-0.20250914143257-6f1674320f1a
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/google/uuid v1.6.0
 	github.com/grafana/pyroscope-go v1.2.4
@@ -12,6 +12,7 @@ require (
 	github.com/ogen-go/ogen v1.14.0
 	github.com/pressly/goose/v3 v3.24.3
 	github.com/prometheus/client_golang v1.23.0
+	github.com/qustavo/sqlhooks/v2 v2.1.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
 	go.opentelemetry.io/otel v1.37.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.37.0

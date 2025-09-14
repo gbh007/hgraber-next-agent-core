@@ -16,11 +16,16 @@ import (
 
 const fileSuffix = ".ac"
 
+type metricProvider interface {
+	IncWebCacheCounter(action string)
+}
+
 type Cache struct {
-	baseDir       string
-	logger        *slog.Logger
-	ttl           time.Duration
-	cleanInterval time.Duration
+	baseDir        string
+	logger         *slog.Logger
+	metricProvider metricProvider
+	ttl            time.Duration
+	cleanInterval  time.Duration
 }
 
 func New(
@@ -28,6 +33,7 @@ func New(
 	logger *slog.Logger,
 	ttl time.Duration,
 	cleanInterval time.Duration,
+	metricProvider metricProvider,
 ) (*Cache, error) {
 	if baseDir == "" {
 		baseDir = path.Join(os.TempDir(), "hgraber-next-agent")
@@ -39,10 +45,11 @@ func New(
 	}
 
 	return &Cache{
-		baseDir:       baseDir,
-		logger:        logger,
-		ttl:           ttl,
-		cleanInterval: cleanInterval,
+		baseDir:        baseDir,
+		logger:         logger,
+		ttl:            ttl,
+		cleanInterval:  cleanInterval,
+		metricProvider: metricProvider,
 	}, nil
 }
 

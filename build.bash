@@ -5,8 +5,8 @@ COMMIT=$(git rev-parse --short HEAD)
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-CORE_MOD_NAME="github.com/gbh007/hgraber-next-agent-core"
-LDFLAGS="-X '${CORE_MOD_NAME}/version.Version=${TAG}' -X '${CORE_MOD_NAME}/version.Commit=${COMMIT}' -X '${CORE_MOD_NAME}/version.BuildAt=${BUILD_TIME}' -X '${CORE_MOD_NAME}/version.Branch=${BRANCH}'"
+VERSION_MOD_NAME="github.com/gbh007/hgraber-next"
+LDFLAGS="-X '${VERSION_MOD_NAME}/version.Version=${TAG}' -X '${VERSION_MOD_NAME}/version.Commit=${COMMIT}' -X '${VERSION_MOD_NAME}/version.BuildAt=${BUILD_TIME}' -X '${VERSION_MOD_NAME}/version.Branch=${BRANCH}'"
 
 go build -ldflags "${LDFLAGS}" -trimpath -o ./_build/agent  ./cmd/agent
 

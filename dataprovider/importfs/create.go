@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
-	"github.com/gbh007/hgraber-next-agent-core/metrics"
 )
 
 func (s *Storage) Create(ctx context.Context, data entities.ImportData) error {
@@ -28,7 +27,7 @@ func (s *Storage) CreateImport(ctx context.Context, data entities.ImportData) (s
 func (s *Storage) create(ctx context.Context, data entities.ImportData) (string, error) {
 	startAt := time.Now()
 	defer func() {
-		metrics.RegisterFSActionTime("create_import", time.Since(startAt))
+		s.metricProvider.RegisterFSActionTime("create_import", nil, time.Since(startAt))
 	}()
 
 	var (

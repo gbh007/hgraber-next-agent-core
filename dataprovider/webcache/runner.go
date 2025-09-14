@@ -7,8 +7,6 @@ import (
 	"path"
 	"strings"
 	"time"
-
-	"github.com/gbh007/hgraber-next-agent-core/metrics"
 )
 
 func (c *Cache) Name() string {
@@ -78,12 +76,11 @@ func (c *Cache) Start(parentCtx context.Context) (chan struct{}, error) {
 						continue
 					}
 
-					metrics.IncWebCacheCounter("expire")
+					c.metricProvider.IncWebCacheCounter("expire")
 				}
 
 			}
 		}
-
 	}()
 
 	return done, nil

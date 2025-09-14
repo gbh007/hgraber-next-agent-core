@@ -10,14 +10,13 @@ import (
 	"time"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
-	"github.com/gbh007/hgraber-next-agent-core/metrics"
 	"github.com/google/uuid"
 )
 
 func (s *Storage) Create(ctx context.Context, fileID uuid.UUID, body io.Reader) error {
 	startAt := time.Now()
 	defer func() {
-		metrics.RegisterFSActionTime("create", time.Since(startAt))
+		s.metricProvider.RegisterFSActionTime("create", nil, time.Since(startAt))
 	}()
 
 	filepath := s.filepath(fileID)

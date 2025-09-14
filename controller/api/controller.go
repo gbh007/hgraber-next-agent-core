@@ -10,10 +10,18 @@ import (
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
 	"github.com/gbh007/hgraber-next/openapi/agentapi"
+	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/google/uuid"
 )
+
+type metricProvider interface {
+	HTTPServerAddHandle(addr, operation string, status bool, d time.Duration)
+	HTTPServerIncActive(addr, operation string)
+	HTTPServerDecActive(addr, operation string)
+	Registry() *prometheus.Registry
+}
 
 type ParsingUseCases interface {
 	CheckBooks(ctx context.Context, urls []url.URL) ([]entities.AgentBookCheckResult, error)
@@ -58,6 +66,8 @@ type Controller struct {
 	debug           bool
 	logErrorHandler bool
 
+	metricProvider metricProvider
+
 	ogenServer *agentapi.Server
 
 	importUseCase   ImportUseCases
@@ -80,6 +90,7 @@ func New(
 	fileUseCase FileUseCases,
 	highwayUseCase HighwayUseCases,
 	parserCodes []string,
+	metricProvider metricProvider,
 ) (*Controller, error) {
 	c := &Controller{
 		startAt:         startAt,
@@ -89,6 +100,7 @@ func New(
 		debug:           config.GetDebug(),
 		logErrorHandler: config.GetLogErrorHandler(),
 		token:           config.GetToken(),
+		metricProvider:  metricProvider,
 
 		parserCodes:    parserCodes,
 		enabledModules: make([]string, 0, 3),
@@ -120,7 +132,10 @@ func New(
 		agentapi.WithErrorHandler(c.methodErrorHandler),
 		agentapi.WithMethodNotAllowed(methodNotAllowed),
 		agentapi.WithNotFound(methodNotFound),
-		agentapi.WithMiddleware(c.simplePanicRecover),
+		agentapi.WithMiddleware(
+			c.metricsMiddleware,
+			c.simplePanicRecover,
+		),
 	)
 	if err != nil {
 		return nil, err

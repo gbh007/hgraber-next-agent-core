@@ -9,14 +9,13 @@ import (
 	"path"
 	"time"
 
-	"github.com/gbh007/hgraber-next-agent-core/metrics"
 	"github.com/gbh007/hgraber-next/pkg"
 )
 
 func (s *Storage) Get(ctx context.Context, relativePath string) (io.Reader, error) {
 	startAt := time.Now()
 	defer func() {
-		metrics.RegisterFSActionTime("get_import", time.Since(startAt))
+		s.metricProvider.RegisterFSActionTime("get_import", nil, time.Since(startAt))
 	}()
 
 	f, err := os.Open(path.Join(s.fsPath, relativePath))

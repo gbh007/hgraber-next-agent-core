@@ -21,6 +21,7 @@ import (
 	"github.com/gbh007/hgraber-next-agent-core/usecase/highway"
 	"github.com/gbh007/hgraber-next-agent-core/usecase/importapi"
 	"github.com/gbh007/hgraber-next-agent-core/usecase/importdeduplicator"
+	"github.com/gbh007/hgraber-next/adapters/metric"
 	"github.com/gbh007/hgraber-next/pkg"
 	"go.opentelemetry.io/otel"
 )
@@ -35,6 +36,7 @@ type ParserInit[T any] func(
 	logger *slog.Logger,
 	cfg config.Config[T],
 	async Async,
+	metricProvider *metric.MetricProvider,
 ) ([]hgraber.Parser, error)
 
 func Serve[T any](ctx context.Context, parserInit ParserInit[T], defaultParsers func() *T) {
@@ -46,6 +48,26 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T], defaultParsers 
 
 	logger := initLogger(cfg)
 	logger.InfoContext(ctx, "initializing system")
+
+	metricProvider, err := metric.New(metric.Config{
+		ServiceName:    cfg.Application.ServiceName,
+		Type:           metric.AgentSystemType,
+		WithGo:         true,
+		WithVersion:    true,
+		WithFS:         true,
+		WithServer:     false,
+		WithDB:         true,
+		WithHTTPServer: true,
+		WithAgent:      true,
+	})
+	if err != nil {
+		logger.ErrorContext(
+			ctx, "fail init metrics",
+			slog.Any("error", err),
+		)
+
+		os.Exit(1)
+	}
 
 	if cfg.Application.Pyroscope.Endpoint != "" {
 		profiler, err := initPyroscope(logger, cfg)
@@ -92,7 +114,7 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T], defaultParsers 
 		mAPI             *masterapi.Client
 	)
 
-	parsers, err := parserInit(ctx, logger, cfg, async)
+	parsers, err := parserInit(ctx, logger, cfg, async, metricProvider)
 	if err != nil {
 		logger.ErrorContext(
 			ctx, "fail init parsers",
@@ -103,7 +125,7 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T], defaultParsers 
 	}
 
 	if len(parsers) > 0 {
-		loader := loader.New(parsers)
+		loader := loader.New(parsers, metricProvider)
 		agentUseCases = agentUC.New(logger, loader)
 
 		logger.DebugContext(
@@ -112,7 +134,13 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T], defaultParsers 
 	}
 
 	if cfg.FSBase.ImportPath != "" {
-		importStorageRaw, err = importfs.New(cfg.FSBase.ImportPath, logger, cfg.FSBase.ImportLimitOnFolder, cfg.Application.UseUnsafeCloser)
+		importStorageRaw, err = importfs.New(
+			logger,
+			metricProvider,
+			cfg.FSBase.ImportPath,
+			cfg.FSBase.ImportLimitOnFolder,
+			cfg.Application.UseUnsafeCloser,
+		)
 		if err != nil {
 			logger.ErrorContext(
 				ctx, "fail init import fs",
@@ -131,7 +159,7 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T], defaultParsers 
 	}
 
 	if cfg.FSBase.FilePath != "" {
-		fileStorage, err = datafs.New(cfg.FSBase.FilePath, logger)
+		fileStorage, err = datafs.New(logger, metricProvider, cfg.FSBase.FilePath)
 		if err != nil {
 			logger.ErrorContext(
 				ctx, "fail init data fs",
@@ -148,7 +176,7 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T], defaultParsers 
 	}
 
 	if cfg.Sqlite.FilePath != "" {
-		dbRaw, err = storage.New(ctx, logger, cfg.Sqlite.FilePath)
+		dbRaw, err = storage.New(ctx, logger, metricProvider, cfg.Sqlite.FilePath)
 		if err != nil {
 			logger.ErrorContext(
 				ctx, "fail init db",
@@ -230,6 +258,7 @@ func Serve[T any](ctx context.Context, parserInit ParserInit[T], defaultParsers 
 			fileStorage,
 			highwayUseCases,
 			parserNames,
+			metricProvider,
 		)
 		if err != nil {
 			logger.ErrorContext(

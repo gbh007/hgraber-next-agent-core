@@ -11,14 +11,18 @@ import (
 
 	"github.com/gbh007/hgraber-next-agent-core/domain/hgraber"
 	"github.com/gbh007/hgraber-next-agent-core/entities"
-	"github.com/gbh007/hgraber-next-agent-core/metrics"
 	"github.com/gbh007/hgraber-next-agent-core/parser/hgraber_local"
 	"github.com/gbh007/hgraber-next-agent-core/parser/mock"
 	"github.com/gbh007/hgraber-next-agent-core/request"
 )
 
+type metricProvider interface {
+	RegisterParserActionTime(action, parserName string, d time.Duration)
+}
+
 type Loader struct {
-	parsers []hgraber.Parser
+	parsers        []hgraber.Parser
+	metricProvider metricProvider
 }
 
 func NewDefaultParsers(
@@ -59,9 +63,11 @@ func NewDefaultParsers(
 
 func New(
 	parsers []hgraber.Parser,
+	metricProvider metricProvider,
 ) *Loader {
 	return &Loader{
-		parsers: parsers,
+		parsers:        parsers,
+		metricProvider: metricProvider,
 	}
 }
 
@@ -97,7 +103,7 @@ func (l *Loader) Load(ctx context.Context, u url.URL) (hgraber.BookParser, error
 	}
 
 	defer func() {
-		metrics.RegisterParserActionTime("loader_load", p.Name(), time.Since(startAt))
+		l.metricProvider.RegisterParserActionTime("loader_load", p.Name(), time.Since(startAt))
 	}()
 
 	bookParser, err := p.Load(ctx, u)
@@ -117,7 +123,7 @@ func (l *Loader) LoadImage(ctx context.Context, u url.URL, bookUrl url.URL) (io.
 	}
 
 	defer func() {
-		metrics.RegisterParserActionTime("loader_load_image", p.Name(), time.Since(startAt))
+		l.metricProvider.RegisterParserActionTime("loader_load_image", p.Name(), time.Since(startAt))
 	}()
 
 	data, err := p.LoadImage(ctx, u, bookUrl)
@@ -137,7 +143,7 @@ func (l *Loader) AllBooks(ctx context.Context, u url.URL) ([]string, error) {
 	}
 
 	defer func() {
-		metrics.RegisterParserActionTime("loader_all_books", p.Name(), time.Since(startAt))
+		l.metricProvider.RegisterParserActionTime("loader_all_books", p.Name(), time.Since(startAt))
 	}()
 
 	data, err := p.AllBooks(ctx, u)
@@ -157,7 +163,7 @@ func (l *Loader) HProxyList(ctx context.Context, u url.URL) (entities.HProxyList
 	}
 
 	defer func() {
-		metrics.RegisterParserActionTime("loader_hproxy_list", p.Name(), time.Since(startAt))
+		l.metricProvider.RegisterParserActionTime("loader_hproxy_list", p.Name(), time.Since(startAt))
 	}()
 
 	data, err := p.HProxyList(ctx, u)
