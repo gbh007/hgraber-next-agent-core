@@ -2,26 +2,24 @@ package api
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
 	"github.com/gbh007/hgraber-next/openapi/agentapi"
 	"github.com/gbh007/hgraber-next/pkg"
 )
 
-func (c *Controller) APIParsingBookCheckPost(ctx context.Context, req *agentapi.APIParsingBookCheckPostReq) (agentapi.APIParsingBookCheckPostRes, error) {
+func (c *Controller) APIParsingBookCheckPost(ctx context.Context, req *agentapi.APIParsingBookCheckPostReq) (*agentapi.BooksCheckResult, error) {
 	if c.parsingUseCases == nil {
-		return &agentapi.APIParsingBookCheckPostBadRequest{
-			InnerCode: ValidationCode,
-			Details:   agentapi.NewOptString("unsupported api"),
-		}, nil
+		return nil, apiError{
+			Code:    http.StatusBadRequest,
+			Details: "unsupported api",
+		}
 	}
 
 	result, err := c.parsingUseCases.CheckBooks(ctx, req.Urls)
 	if err != nil {
-		return &agentapi.APIParsingBookCheckPostInternalServerError{
-			InnerCode: ParseUseCaseCode,
-			Details:   agentapi.NewOptString(err.Error()),
-		}, nil
+		return nil, err
 	}
 
 	return &agentapi.BooksCheckResult{

@@ -2,26 +2,24 @@ package api
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
 	"github.com/gbh007/hgraber-next/openapi/agentapi"
 	"github.com/gbh007/hgraber-next/pkg"
 )
 
-func (c *Controller) APIHproxyParseListPost(ctx context.Context, req *agentapi.APIHproxyParseListPostReq) (agentapi.APIHproxyParseListPostRes, error) {
+func (c *Controller) APIHproxyParseListPost(ctx context.Context, req *agentapi.APIHproxyParseListPostReq) (*agentapi.APIHproxyParseListPostOK, error) {
 	if c.parsingUseCases == nil {
-		return &agentapi.APIHproxyParseListPostBadRequest{
-			InnerCode: ValidationCode,
-			Details:   agentapi.NewOptString("unsupported api"),
-		}, nil
+		return nil, apiError{
+			Code:    http.StatusBadRequest,
+			Details: "unsupported api",
+		}
 	}
 
 	list, err := c.parsingUseCases.HProxyList(ctx, req.URL)
 	if err != nil {
-		return &agentapi.APIHproxyParseListPostInternalServerError{
-			InnerCode: ParseUseCaseCode,
-			Details:   agentapi.NewOptString(err.Error()),
-		}, nil
+		return nil, err
 	}
 
 	var nextPage agentapi.OptURI

@@ -2,18 +2,19 @@ package api
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
 	"github.com/gbh007/hgraber-next/openapi/agentapi"
 	"github.com/gbh007/hgraber-next/pkg"
 )
 
-func (c *Controller) APIHproxyParseBookPost(ctx context.Context, req *agentapi.APIHproxyParseBookPostReq) (agentapi.APIHproxyParseBookPostRes, error) {
+func (c *Controller) APIHproxyParseBookPost(ctx context.Context, req *agentapi.APIHproxyParseBookPostReq) (*agentapi.APIHproxyParseBookPostOK, error) {
 	if c.parsingUseCases == nil {
-		return &agentapi.APIHproxyParseBookPostBadRequest{
-			InnerCode: ValidationCode,
-			Details:   agentapi.NewOptString("unsupported api"),
-		}, nil
+		return nil, apiError{
+			Code:    http.StatusBadRequest,
+			Details: "unsupported api",
+		}
 	}
 
 	var pageLimit *int
@@ -24,10 +25,7 @@ func (c *Controller) APIHproxyParseBookPost(ctx context.Context, req *agentapi.A
 
 	details, err := c.parsingUseCases.HProxyBook(ctx, req.URL, pageLimit)
 	if err != nil {
-		return &agentapi.APIHproxyParseBookPostInternalServerError{
-			InnerCode: ParseUseCaseCode,
-			Details:   agentapi.NewOptString(err.Error()),
-		}, nil
+		return nil, err
 	}
 
 	return &agentapi.APIHproxyParseBookPostOK{

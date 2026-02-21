@@ -2,24 +2,22 @@ package api
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/gbh007/hgraber-next/openapi/agentapi"
 )
 
-func (c *Controller) APIHighwayTokenCreatePost(ctx context.Context) (agentapi.APIHighwayTokenCreatePostRes, error) {
+func (c *Controller) APIHighwayTokenCreatePost(ctx context.Context) (*agentapi.APIHighwayTokenCreatePostOK, error) {
 	if c.highwayUseCase == nil {
-		return &agentapi.APIHighwayTokenCreatePostBadRequest{
-			InnerCode: ValidationCode,
-			Details:   agentapi.NewOptString("unsupported api"),
-		}, nil
+		return nil, apiError{
+			Code:    http.StatusBadRequest,
+			Details: "unsupported api",
+		}
 	}
 
 	token, vu, err := c.highwayUseCase.NewToken(ctx)
 	if err != nil {
-		return &agentapi.APIHighwayTokenCreatePostInternalServerError{
-			InnerCode: HighwayUseCaseCode,
-			Details:   agentapi.NewOptString(err.Error()),
-		}, nil
+		return nil, err
 	}
 
 	return &agentapi.APIHighwayTokenCreatePostOK{

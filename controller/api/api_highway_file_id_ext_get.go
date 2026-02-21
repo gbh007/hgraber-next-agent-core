@@ -4,47 +4,45 @@ import (
 	"context"
 	"errors"
 	"mime"
+	"net/http"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
 	"github.com/gbh007/hgraber-next/openapi/agentapi"
 )
 
-func (c *Controller) APIHighwayFileIDExtGet(ctx context.Context, params agentapi.APIHighwayFileIDExtGetParams) (agentapi.APIHighwayFileIDExtGetRes, error) {
+func (c *Controller) APIHighwayFileIDExtGet(ctx context.Context, params agentapi.APIHighwayFileIDExtGetParams) (*agentapi.APIHighwayFileIDExtGetOKHeaders, error) {
 	if c.highwayUseCase == nil {
-		return &agentapi.APIHighwayFileIDExtGetBadRequest{
-			InnerCode: ValidationCode,
-			Details:   agentapi.NewOptString("unsupported api"),
-		}, nil
+		return nil, apiError{
+			Code:    http.StatusBadRequest,
+			Details: "unsupported api",
+		}
 	}
 
 	if params.Token == "" {
-		return &agentapi.APIHighwayFileIDExtGetUnauthorized{
-			InnerCode: ValidationCode,
-			Details:   agentapi.NewOptString("unsupported api"),
-		}, nil
+		return nil, apiError{
+			Code:    http.StatusBadRequest,
+			Details: "missing token",
+		}
 	}
 
 	err := c.highwayUseCase.ValidateToken(ctx, params.Token)
 	if err != nil {
-		return &agentapi.APIHighwayFileIDExtGetForbidden{
-			InnerCode: HighwayUseCaseCode,
-			Details:   agentapi.NewOptString(err.Error()),
-		}, nil
+		return nil, apiError{
+			Code:    http.StatusForbidden,
+			Details: err.Error(),
+		}
 	}
 
 	body, err := c.highwayUseCase.Get(ctx, params.ID)
 	if errors.Is(err, entities.FileNotFoundError) {
-		return &agentapi.APIHighwayFileIDExtGetNotFound{
-			InnerCode: HighwayUseCaseCode,
-			Details:   agentapi.NewOptString(err.Error()),
-		}, nil
+		return nil, apiError{
+			Code:    http.StatusNotFound,
+			Details: err.Error(),
+		}
 	}
 
 	if err != nil {
-		return &agentapi.APIHighwayFileIDExtGetInternalServerError{
-			InnerCode: HighwayUseCaseCode,
-			Details:   agentapi.NewOptString(err.Error()),
-		}, nil
+		return nil, err
 	}
 
 	// Это не самый правильный и ленивый костыль, но пока его будет достаточно

@@ -78,9 +78,9 @@ func stackTrace(skip, count int) []string {
 
 func (c *Controller) methodErrorHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) {
 	var (
-		httpCode         int    = http.StatusInternalServerError
-		errorCode        string = "internal error"
-		errorDescription string = "missing error"
+		httpCode         = http.StatusInternalServerError
+		errorCode        = "internal error"
+		errorDescription = "missing error"
 	)
 
 	if err != nil {

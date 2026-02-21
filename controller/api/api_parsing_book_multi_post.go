@@ -2,24 +2,22 @@ package api
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/gbh007/hgraber-next/openapi/agentapi"
 )
 
-func (c *Controller) APIParsingBookMultiPost(ctx context.Context, req *agentapi.APIParsingBookMultiPostReq) (agentapi.APIParsingBookMultiPostRes, error) {
+func (c *Controller) APIParsingBookMultiPost(ctx context.Context, req *agentapi.APIParsingBookMultiPostReq) (*agentapi.BooksCheckResult, error) {
 	if c.parsingUseCases == nil {
-		return &agentapi.APIParsingBookMultiPostBadRequest{
-			InnerCode: ValidationCode,
-			Details:   agentapi.NewOptString("unsupported api"),
-		}, nil
+		return nil, apiError{
+			Code:    http.StatusBadRequest,
+			Details: "unsupported api",
+		}
 	}
 
 	result, err := c.parsingUseCases.MultiHandle(ctx, req.URL)
 	if err != nil {
-		return &agentapi.APIParsingBookMultiPostInternalServerError{
-			InnerCode: ParseUseCaseCode,
-			Details:   agentapi.NewOptString(err.Error()),
-		}, nil
+		return nil, err
 	}
 
 	return &agentapi.BooksCheckResult{

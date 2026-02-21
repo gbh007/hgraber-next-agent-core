@@ -2,18 +2,19 @@ package api
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/gbh007/hgraber-next-agent-core/entities"
 	"github.com/gbh007/hgraber-next/openapi/agentapi"
 	"github.com/gbh007/hgraber-next/pkg"
 )
 
-func (c *Controller) APIParsingPageCheckPost(ctx context.Context, req *agentapi.APIParsingPageCheckPostReq) (agentapi.APIParsingPageCheckPostRes, error) {
+func (c *Controller) APIParsingPageCheckPost(ctx context.Context, req *agentapi.APIParsingPageCheckPostReq) (*agentapi.APIParsingPageCheckPostOK, error) {
 	if c.parsingUseCases == nil {
-		return &agentapi.APIParsingPageCheckPostBadRequest{
-			InnerCode: ValidationCode,
-			Details:   agentapi.NewOptString("unsupported api"),
-		}, nil
+		return nil, apiError{
+			Code:    http.StatusBadRequest,
+			Details: "unsupported api",
+		}
 	}
 
 	result, err := c.parsingUseCases.CheckPages(ctx, pkg.Map(req.Urls, func(u agentapi.APIParsingPageCheckPostReqUrlsItem) entities.AgentPageURL {
@@ -23,10 +24,7 @@ func (c *Controller) APIParsingPageCheckPost(ctx context.Context, req *agentapi.
 		}
 	}))
 	if err != nil {
-		return &agentapi.APIParsingPageCheckPostInternalServerError{
-			InnerCode: ParseUseCaseCode,
-			Details:   agentapi.NewOptString(err.Error()),
-		}, nil
+		return nil, err
 	}
 
 	return &agentapi.APIParsingPageCheckPostOK{
