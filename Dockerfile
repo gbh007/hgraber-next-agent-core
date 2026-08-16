@@ -1,16 +1,34 @@
-FROM alpine:3.20
+FROM golang:1.26.5 AS go-builder
 
-# добавление ssl сертификатов и пакета временых зон
-RUN apk update && apk add ca-certificates tzdata
+# TODO: подумать над включением
+# RUN useradd -u 1000 nonroot
+WORKDIR /build
 
-RUN mkdir /app
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target="$(go env GOMODCACHE)" \
+    --mount=type=cache,target="$(go env GOCACHE)" \
+    go mod download
+
+COPY . .
+RUN --mount=type=cache,target="$(go env GOMODCACHE)" \
+    --mount=type=cache,target="$(go env GOCACHE)" \
+    CGO_ENABLED=0 go build \
+    -trimpath \
+    -ldflags="-s -w" \
+    -o /build/main \
+    ./cmd/agent
 
 
-ARG BINARY_PATH
-COPY ${BINARY_PATH} /app/main
+FROM scratch
 
-RUN chmod +x /app/main
+COPY --from=go-builder /etc/passwd /etc/passwd
+COPY --from=go-builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=go-builder /usr/share/zoneinfo /usr/share/zoneinfo
 
+COPY --from=go-builder /build/main /app/main
+
+# TODO: подумать над включением
+# USER nonroot
 WORKDIR /app
 
 ENTRYPOINT ["/app/main"]

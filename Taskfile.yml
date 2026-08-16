@@ -1,0 +1,48 @@
+version: "3"
+
+vars:
+  SERVICE_BIN: "{{ .USER_WORKING_DIR }}/_build"
+
+env:
+  CGO_ENABLED: 0
+
+tasks:
+  install:server:
+    cmd: go mod download
+
+  go:generate:config:
+    cmds:
+      - "go build -trimpath -o {{ .SERVICE_BIN }}/configremaper  ./cmd/configremaper"
+      - "{{ .SERVICE_BIN }}/configremaper --out config-generated.yaml"
+      - "{{ .SERVICE_BIN }}/configremaper --out config-generated.env"
+      - "{{ .SERVICE_BIN }}/configremaper --out config-generated.toml"
+
+  go:update-dep:
+    cmds:
+      - go get -u github.com/gbh007/hgraber-next@master
+      - go mod tidy
+
+  build:server:
+    cmds:
+      - CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath -o {{ .SERVICE_BIN }}/agent-linux-arm64  ./cmd/agent
+      - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -o {{ .SERVICE_BIN }}/agent-linux-amd64  ./cmd/agent
+      - CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -o {{ .SERVICE_BIN }}/agent-windows-amd64.exe  ./cmd/agent
+
+  build:docker:
+    cmds:
+      - docker build -t hgraber-next-agent:latest .
+
+  run:server:
+    cmds:
+      - "go build -trimpath -o {{ .SERVICE_BIN }}/agent ./cmd/agent"
+      - "{{ .SERVICE_BIN }}/agent"
+
+  run:server:example:
+    cmds:
+      - "go build -trimpath -o {{ .SERVICE_BIN }}/agent ./cmd/agent"
+      - "{{ .SERVICE_BIN }}/agent --config config-example.yaml"
+
+  run:server:scan:
+    cmds:
+      - "go build -trimpath -o {{ .SERVICE_BIN }}/agent ./cmd/agent"
+      - "{{ .SERVICE_BIN }}/agent --scan"

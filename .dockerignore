@@ -1,0 +1,11 @@
+.dockerignore
+
+*.toml
+*.env
+*.db
+*.sqlite
+
+.hidden
+
+/_build
+/docs
